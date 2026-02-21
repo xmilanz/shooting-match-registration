@@ -28,5 +28,5 @@ $smtp_server="server";
 $web_adresa = "https://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']);
 $web_adresa_admin = str_replace('admin', '', $web_adresa);
 
-$vyvojar = "email";
+$vyvojar = "webdesign@milanz.org";
 ?>
