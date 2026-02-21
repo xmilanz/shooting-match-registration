@@ -1,0 +1,554 @@
+/*----------------------------------------------
+	Main Structure
+-----------------------------------------------*/
+
+body,html {
+	margin:0 5px 0 5px;
+	font-family: 'Roboto Condensed', Sans-serif;
+    font-size: 13px;
+	background: #505050 url(../images/bkg.png) left top repeat !important;
+}
+
+.header {
+    border-top: 8px solid rgb(22, 22, 22);    
+}
+
+.header-logo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+}
+
+.logo-left,
+.logo-right {
+    flex:1;
+    background-repeat: no-repeat;
+    background-size: contain;
+    height: 90px;
+    width: auto;
+    margin: 5px;
+}
+
+.logo-left {
+    background-image: url("../images/logo-header-ssaspt.png");
+	background-position: left center;
+}
+
+.logo-right {
+	background-image: url("");
+    background-position: center right;
+}
+
+.text-center {
+    flex: auto;            /* vyplní prostor mezi logy */
+    text-align: center;
+}
+
+.text-center a:hover {
+    text-decoration: none;
+    color: #222;
+}
+
+.logo-text {
+    color: #222;
+    font-weight: bolder;
+    text-shadow: 2px 2px 7px gray;
+    font-size: 2.5em;
+}
+
+a.logo-text, a.card-link {
+    text-decoration: none;
+    color: #222;
+}
+
+.container {
+    width: auto;
+    margin: 0 auto;
+    box-shadow: 0 0 6px #000;
+	background-color:#F5F5F5 ;
+	padding: 0px !important;
+}
+
+.content {
+	padding: 10px;
+}
+
+.footer {
+    background:#000;
+    padding:10px;
+    color: #fff;
+    box-sizing:border-box;
+}
+
+.text-dashed {
+    border-bottom: 1px dashed #999 !important;
+    display: inline !important;
+}
+
+fieldset legend {
+  margin-bottom: 0rem !important;
+}
+
+textarea {
+  field-sizing: content;
+}
+
+.disciplines th {
+    font-weight: 600;
+    background-color: #dee2e6 !important;
+}
+
+/* seznam závodníků */
+th.sorting, th.sorting.dtfc-fixed-left {background-color: #2375d2 !important; font-size: 13px; }
+
+table#zavodnici  {
+    border-collapse: collapse; 
+    font-size: 12px;
+    max-width: 100% !important;
+    white-space: nowrap;
+}
+
+#zavodnici th {
+	background-color: #2375d2 !important;
+    color: #fff;
+    font-size: 12px;
+    padding: 10px;
+    text-align: left;
+	white-space: nowrap;
+}
+
+#zavodnici img  {margin: 1px;}
+
+#zavodnici td {
+    text-align: center;
+	white-space: nowrap; 
+}
+
+#zavodnici td.Cislo {
+    text-align: right;
+}
+
+#zavodnici td.Příjmení, 
+#zavodnici td.Jméno {
+    text-align: left;
+    padding-left: 5px !important;
+}
+
+/* odliseni radku podle statutu */
+.zavodnik-bulk-1-st, .zavodnik-bulk-others {
+    --bs-table-color: #0047AB; 
+    --bs-table-striped-color: #0047AB; 
+    font-weight: bold;
+    color: #0047AB;
+}
+.zavodnik-bulk-others {
+    font-weight: normal;
+}
+.zavodnik-vyrazeno {
+    text-decoration: line-through;
+}
+
+.zavodnik-namiste {
+    --bs-table-color:#7433FF;
+    --bs-table-striped-color : #7433FF;
+    color:#7433FF;
+}
+
+.zavodnik-zaplatil {
+    --bs-table-color:#11772d;
+    --bs-table-striped-color : #11772d;
+    font-weight: bold;
+    color: #11772d;
+}
+
+.zavodnik-nezaplaceno {
+    --bs-table-color:#ff0000;
+    --bs-table-striped-color : #ff0000;
+    color: #ff0000;
+}
+
+
+.badge {
+    opacity: 0.7;
+}
+
+.btn.text-secondary:hover {
+  color: #000 !important;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+button[class^="modal_"] {
+    font-size: inherit;
+    border: 0px;
+    width: 80px;
+    text-align: left;
+}
+
+button[class^="modal_"].disabled {
+    opacity: 0.2 !important;
+}
+
+.bulk-label {
+  font-size: 0.65rem;
+  margin-left: 0.3em;
+  opacity: 0.7;
+  font-weight: 500;
+  vertical-align: super;    /* posun nahoru jako horní index */
+}
+
+td.save-cell {
+    width: 125px;
+    text-align: center;
+}
+
+/* print preview */
+table.print, td.print {border: 1px solid black !important;}
+th.print {background-color: #dee2e6 !important; }
+
+/* legenda */
+
+.legenda ul{
+	list-style-type: "- ";
+}
+
+.legenda li{
+	margin-left: -15px;
+	display: table;
+}
+
+/*----------------------------------------------
+	DataTable
+-----------------------------------------------*/
+.dataTables_scroll {font-size: 10px;}
+.dtsb-titleRow, .dtsb-searchBuilder {display: none;} 
+.dtsb-group {max-width: 600px;}
+div.dt-container div.dt-layout-start>*:not(:last-child) {margin-left: 20px;}
+.dt-print-view {background: #ffffff;}
+.d-md-flex.dt-layout-start{ display: block !important;}
+button.btn.btn-secondary.btn-rounded,
+button.btn.btn-secondary.buttons-collection,
+button.btn.btn-secondary.buttons-excel.buttons-html5,
+button.btn.btn-secondary.buttons-csv.buttons-html5,
+button.btn.btn-secondary.buttons-print
+ {
+    background-color: #4a9fff;
+    color: #ffffff;
+ }
+
+/*----------------------------------------------
+  Bootstrap
+-----------------------------------------------*/
+/* ---------- BS callout ---------- */
+.bd-callout {
+  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  color: #495057;
+  background-color: #f8f9fa;
+  border-left: 0.25rem solid #dee2e6;
+  border-top: 1px solid #dee2e6;
+  border-right: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.bd-callout-info {
+  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  color: #055160;
+  background-color: #cff4fc;
+  border-left: 0.25rem solid #9eeaf9;
+  border-top: 1px solid #9eeaf9;
+  border-right: 1px solid #9eeaf9;
+  border-bottom: 1px solid #9eeaf9;
+  border-radius: 4px;
+}
+
+.bd-callout-warning {
+  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  color: #664d03;
+  background-color: #fff3cd;
+  border-left: 0.25rem solid #ffe69c;
+  border-top: 1px solid #ffe69c;
+  border-right: 1px solid #ffe69c;
+  border-bottom: 1px solid #ffe69c;
+  border-radius: 4px;  
+}
+
+.bd-callout-danger {
+  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  color: #58151c;
+  background-color: #f8d7da;
+  border-left: 0.25rem solid #f1aeb5;
+  border-top: 1px solid #f1aeb5;
+  border-right: 1px solid #f1aeb5;
+  border-bottom: 1px solid #f1aeb5;
+  border-radius: 4px;  
+}
+
+.bd-callout strong {
+  color: #6c757d;
+  font-size: 16px;
+  padding-right: 8px;
+}
+
+.bd-callout-info strong {
+  color: #055160;
+  font-size: 16px;
+  padding-right: 8px;
+}
+
+.bd-callout-warning strong {
+  color: #664d03;
+  font-size: 16px;
+  padding-right: 8px;
+}
+
+.bd-callout-danger strong {
+  color: #58151c;
+  font-size: 16px;
+  padding-right: 8px;
+}
+
+.bd-callout h4 {
+  margin-bottom: .25rem;
+}
+
+.bd-callout>:last-child {
+  margin-bottom: 0;
+}
+
+.bd-callout+.bd-callout {
+  margin-top: -.25rem;
+}
+
+.bd-callout .highlight {
+  background-color: rgba(0,0,0,0.05);
+}
+
+.close {opacity: .75;}
+
+.navbar { border-bottom: 2px solid #e9ecef; }
+
+::placeholder {
+  opacity: .75 !important;
+  font-style: italic;
+}
+
+.modal-body {
+    max-height: 75vh; 
+    overflow-y: auto; 
+    overflow-x: hidden;
+}
+
+nav.navbar.navbar-expand-lg {padding: 10px;}
+
+
+/*----------------------------------------------
+  accordion
+-----------------------------------------------*/
+
+.accordion-body {background-color: #fdfdfd;}
+
+/* Výchozí zavřená položka */
+.accordion-button.collapsed {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+/* Otevřená položka */
+.accordion-button:not(.collapsed) {
+    background-color: #0d6efd;
+    color: #fff;
+}
+
+/* Vyřazený (special case) */
+.accordion-button.is-vyrazeno.collapsed {
+    background-color: #6c757d !important;
+    color: #fff !important;
+}
+.accordion-button.is-vyrazeno:not(.collapsed) {
+    background-color: #5a6268 !important;
+    color: #fff !important;
+}
+
+/* Zaplaceno (special case) */
+.accordion-button.is-paid.collapsed {
+    background-color: #198754 !important;
+    color: #fff !important;
+}
+.accordion-button.is-paid:not(.collapsed) {
+    background-color: #157347 !important;
+    color: #fff !important;
+}
+
+/*----------------------------------------------
+  accordion konec
+-----------------------------------------------*/
+
+
+.form-check-input {
+    margin-right: 5px;
+}
+
+i.toggle-password {
+    position: relative;
+    left: 320px;
+    top: -25px;
+    cursor: pointer;
+}
+
+.form-group .form-control {
+    padding-left: 2.375rem;
+}
+
+.form-group .form-control-icon {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    width: 2.375rem;
+    height: 2.375rem;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    color: #aaa;
+}
+
+
+.toast-top-10 {
+  top: 10px;
+  z-index: 1080;
+}
+
+.btn-label {
+    position: relative;
+    left: -10px;
+    display: inline-block;
+    padding: 6px 12px;
+    background: rgba(0,0,0,0.15);
+    border-radius: 3px 0 0 3px;
+}
+.btn-labeled {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* login area - user */ 
+.btn.btn-dark.custom:hover {
+    background-color: #212529;
+}
+
+/*----------------------------------------------
+  Datepicker
+-----------------------------------------------*/
+.datepicker-days th {border: none !important;}
+
+
+/*----------------------------------------------
+  Dropdown
+-----------------------------------------------*/
+/* Vlastní styl pro dropdown */
+
+.nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+/* Modal bude mít vyšší z-index než dropdown */
+.modal {
+      z-index: 1050;
+}
+
+
+/* dropdown s popover efektem */
+
+.userArea.dropdown-menu::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    right: 16px;
+    border-width: 0 8px 8px 8px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0,0,0,.15) transparent;
+}
+
+.userArea.dropdown-menu::after {
+    content: "";
+    position: absolute;
+    top: -7px;
+    right: 16px;
+    border-width: 0 7px 7px 7px;
+    border-style: solid;
+    border-color: transparent transparent #fff transparent;
+}
+.userArea.dropdown-menu {
+    animation: fadeIn .2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/*----------------------------------------------
+	Tooltip
+-----------------------------------------------*/
+
+.tooltip {
+  cursor: help;
+  position: relative !important;
+  display: inline-block !important;
+  border-bottom: 1px dotted black  !important;
+  opacity: 1 !important;
+  z-index: 100 !important;
+  font-size: inherit  !important;
+ 
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: #F5F5F5;
+  border: 1px solid darkgrey;
+  color: black;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 11px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: 30px;
+  right: -30%;
+
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.tooltiptext ul { 
+	padding-left: 20px;
+	font-weight: normal;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+/*----------------------------------------------
+	Upload
+-----------------------------------------------*/
+.form-control {height: auto !important;}
+
