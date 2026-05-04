@@ -20,13 +20,13 @@
 </div>
 <script>
     $('.modal_info_shooter').click(function() {
-        var ID = $(this).data('id');
-        $('#modalID').val(ID);
+        var ID = $(this).data('id'); // Získáme ID z data-id
+        $('#modalID').val(ID); // Uložíme ID do skrytého inputu
 
         $.post("information.php", {
             ID: ID
         }, function(result) {
-            $("#modal-info-included").html(result);
+            $("#modal-info-included").html(result); // Naplníme pouze obsah modalu
         });
     });
 </script>

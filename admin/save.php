@@ -1,25 +1,21 @@
-<link rel="stylesheet" type="text/css" href="../styles/style_admin.css">
+<link rel="stylesheet" type="text/css" href="/styles/style.css">
 <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <?php
-session_start();
-if (!isset($_SESSION['loggedin'])) {
-    header('Location: ../index.php');
-    exit();
-}
-
-require_once __DIR__ . '/../db/dbconn.php';
-require_once __DIR__ . '/../config/mail_texty.php';
+require_once __DIR__ . '/session_init.php';
+require_once __DIR__ . '/db/dbconn.php';
+require_once __DIR__ . '/config/mail_texty.php';
+require_admin();
 
 $conn = new mysqli($db_host, $db_login, $db_pass, $db_dtb);
 
 
 // KONFIGRACE ZAVODU 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
-    if ($match_data['Payment_before'] == "on") {
+    if ($match_data['Payment_before']) {
         $stmt = $conn->prepare("
-	UPDATE match_config 
+	UPDATE $table_matches 
         SET Banka_ucet_cislo = ?,
    	 Banka_ucet_kod = ?,
    	 Banka_nazev = ?,
@@ -33,13 +29,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
    	 Zavod_konec_registrace = ?,
    	 Zavod_registrace_pozastaveno = ?,
    	 Zavod_registrace_hromadna = ?,
+     Zavod_registrace_smeny = ?,
    	 Zavod_more_divisions = ?,
    	 Zavod_zobrazovat_sponzory = ?,
      Zavod_obcansky_prukaz = ?,
    	 Zavod_zbrojni_prukaz = ?,
    	 Zavod_cislo_zbrane = ?,
+     Zavod_nazev_zbrane = ?,
+     Zavod_platba_volitelna = ?,
    	 Web_zobrazovat_situace = ?,
    	 Web_zobrazovat_aliasy = ?,
+   	 Web_zobrazovat_vysledky = ?,
    	 Zavod_cas_prematch = ?,
    	 Zavod_cas_prezence = ?,
    	 Zavod_cas_main = ?,
@@ -63,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
    	 Zavod_telefon_hospodar = ?,
    	 Zavod_email_from = ?,
    	 Zavod_stages = ?,
+     Pocet_smen = ?,
    	 Zavod_min_pocet_ran = ?,
    	 Zavod_pocet_dni_na_platbu = ?,
    	 Zavod_vysledky = ?,
@@ -73,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
     WHERE Zavod_id = ?
     ");
         $stmt->bind_param(
-            "ssssssssssssssssssssssssssssssssssssssssssiiissiiss",
+            "sssssssssssissssssssssssssssssssssssssssssssssiiiissiiss",
             $_POST['Banka_ucet_cislo'],
             $_POST['Banka_ucet_kod'],
             $_POST['Banka_nazev'],
@@ -87,13 +88,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
             $_POST['Zavod_konec_registrace'],
             $_POST['Zavod_registrace_pozastaveno'],
             $_POST['Zavod_registrace_hromadna'],
+            $_POST['Zavod_registrace_smeny'],
             $_POST['Zavod_more_divisions'],
             $_POST['Zavod_zobrazovat_sponzory'],
             $_POST['Zavod_obcansky_prukaz'],
             $_POST['Zavod_zbrojni_prukaz'],
             $_POST['Zavod_cislo_zbrane'],
+            $_POST['Zavod_nazev_zbrane'],
+            $_POST['Zavod_platba_volitelna'],
             $_POST['Web_zobrazovat_situace'],
             $_POST['Web_zobrazovat_aliasy'],
+            $_POST['Web_zobrazovat_vysledky'],
             $_POST['Zavod_cas_prematch'],
             $_POST['Zavod_cas_prezence'],
             $_POST['Zavod_cas_main'],
@@ -117,6 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
             $_POST['Zavod_telefon_hospodar'],
             $_POST['Zavod_email_from'],
             $_POST['Zavod_stages'],
+            $_POST['Pocet_smen'],
             $_POST['Zavod_min_pocet_ran'],
             $_POST['Zavod_pocet_dni_na_platbu'],
             $_POST['Zavod_vysledky'],
@@ -128,8 +134,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
         );
     } else {
         $stmt = $conn->prepare("
-	UPDATE match_config 
-        SET Klub_web = ?,
+	UPDATE $table_matches 
+            SET Banka_ucet_cislo = ?,
+   	 Banka_ucet_kod = ?,
+     Klub_web = ?,
      Zavod = ?,
      Zavod_datum = ?,
      Zavod_cas_registrace_zacatek = ?,
@@ -138,13 +146,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
      Zavod_konec_registrace = ?,
      Zavod_registrace_pozastaveno = ?,
      Zavod_registrace_hromadna = ?,
+     Zavod_registrace_smeny = ?,
      Zavod_more_divisions = ?,
      Zavod_zobrazovat_sponzory = ?,
      Zavod_obcansky_prukaz = ?,
      Zavod_zbrojni_prukaz = ?,
      Zavod_cislo_zbrane = ?,
+     Zavod_nazev_zbrane = ?,
+     Zavod_platba_volitelna = ?,
      Web_zobrazovat_situace = ?,
      Web_zobrazovat_aliasy = ?,
+     Web_zobrazovat_vysledky = ?,
      Zavod_cas_prematch = ?,
      Zavod_cas_prezence = ?,
      Zavod_cas_main = ?,
@@ -168,6 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
      Zavod_telefon_hospodar = ?,
      Zavod_email_from = ?,
      Zavod_stages = ?,
+     Pocet_smen = ?,
      Zavod_min_pocet_ran = ?,
      Zavod_pocet_dni_na_platbu = ?,
      Zavod_vysledky = ?,
@@ -178,7 +191,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
     WHERE Zavod_id = ?
     ");
         $stmt->bind_param(
-            "ssssssssssssssssssssssssssssssssssssssiiissiiss",
+            "sssssssssisssssssssssssssssssssssssssssssssssiiissiiss",
+            $_POST['Banka_ucet_cislo'],
+            $_POST['Banka_ucet_kod'],
             $_POST['Klub_web'],
             $_POST['Zavod'],
             $_POST['Zavod_datum'],
@@ -188,13 +203,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
             $_POST['Zavod_konec_registrace'],
             $_POST['Zavod_registrace_pozastaveno'],
             $_POST['Zavod_registrace_hromadna'],
+            $_POST['Zavod_registrace_smeny'],
             $_POST['Zavod_more_divisions'],
             $_POST['Zavod_zobrazovat_sponzory'],
             $_POST['Zavod_obcansky_prukaz'],
             $_POST['Zavod_zbrojni_prukaz'],
             $_POST['Zavod_cislo_zbrane'],
+            $_POST['Zavod_nazev_zbrane'],
+            $_POST['Zavod_platba_volitelna'],
             $_POST['Web_zobrazovat_situace'],
             $_POST['Web_zobrazovat_aliasy'],
+            $_POST['Web_zobrazovat_vysledky'],
             $_POST['Zavod_cas_prematch'],
             $_POST['Zavod_cas_prezence'],
             $_POST['Zavod_cas_main'],
@@ -218,6 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
             $_POST['Zavod_telefon_hospodar'],
             $_POST['Zavod_email_from'],
             $_POST['Zavod_stages'],
+            $_POST['Pocet_smen'],
             $_POST['Zavod_min_pocet_ran'],
             $_POST['Zavod_pocet_dni_na_platbu'],
             $_POST['Zavod_vysledky'],
@@ -254,7 +274,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
         ];
     }
     $stmt->close();
-    header("Location: index.php");
+    header("Location: /");
     exit();
 }
 
@@ -262,14 +282,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['match_config'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_shooter'])) {
     $jmeno = trim(mb_convert_case($_POST['Jmeno'], MB_CASE_TITLE, "UTF-8"));
     $prijmeni = trim(mb_convert_case($_POST['Prijmeni'], MB_CASE_TITLE, "UTF-8")) . $_POST['Prijmeni_stav'] . '';
+    $stav =  $_POST['Stav'];
     $ip = ($_SERVER["REMOTE_ADDR"] . " - admin");
     $op = trim($_POST['ObcanskyPrukaz'] ?? '');
-    $zo = isset($_POST['ZbrojniOpravneni']) ? 'on' : '';
+    $zo = isset($_POST['ZbrojniOpravneni']) ? 1 : 0;
     $cz = normalizePrukaz(trim($_POST['CZ']) ?? '');
+    $nz = normalizetext(trim($_POST['NZ']) ?? '');
     $kategorie = $_POST['Kategorie'] ?? '';
     $email = trim($_POST['Mail']);
+    $namiste = isset($_POST['ZaplatiNaMiste']) ? 1 : 0;
     $varsymbol = rand(1000, 9999);
     $klic = rand(1000, 9999);
+
+    // kontrola, zda stav již není obsazený - TO-DO
+    $ShiftStmt = $conn->prepare("
+    SELECT 1 FROM $table 
+    WHERE Stav = ?
+    LIMIT 1
+");
+    $ShiftStmt->bind_param("i", $stav);
+    $ShiftStmt->execute();
+    $result = $ShiftStmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $_SESSION['toast'] = [
+            'type'    => 'danger',
+            'message' => 'Stav je již obsazen.',
+            'duration' => 3000
+        ];
+        header("Location: /");
+        exit;
+    }
 
     // ziskame castku za jednu disciplinu
     $FeeStmt = $conn->prepare("SELECT * FROM $table_fee ORDER BY Count");
@@ -279,16 +322,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_shooter'])) {
 
     $stmt = $conn->prepare("
 		INSERT INTO $table 
-        (Prijmeni,Jmeno,ObcanskyPrukaz,ZbrojniOpravneni,CisloZbrane,VarSym,Kategorie,Mail,Disciplina,DatReg,RegistraceIP,Staff,klic,ZaplatiNaMiste,CastkaZaplatit,Poznamka,Zavod)
-        VALUES (?, ?, NULLIF(?,''), ?, NULLIF(?,''),NULLIF(?,''), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (Prijmeni,Jmeno,Stav,ObcanskyPrukaz,ZbrojniOpravneni,CisloZbrane,NazevZbrane,VarSym,Kategorie,Mail,Disciplina,DatReg,RegistraceIP,Staff,klic,ZaplatiNaMiste,CastkaZaplatit,Poznamka,Zavod)
+        VALUES (?, ?, NULLIF(?,''), NULLIF(?,''), NULLIF(?,''), NULLIF(?,''), NULLIF(?,''), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
     $stmt->bind_param(
-        "sssssissssssisiss",
+        "ssissssissssssisiss",
         $prijmeni,
         $jmeno,
+        $stav,
         $op,
         $zo,
         $cz,
+        $nz,
         $varsymbol,
         $kategorie,
         $email,
@@ -297,7 +342,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_shooter'])) {
         $ip,
         $_POST['Staff'],
         $klic,
-        $_POST['ZaplatiNaMiste'],
+        $namiste,
         $feeValues[0]['Value'],
         $_POST['Poznamka'],
         $table
@@ -337,6 +382,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_shooter'])) {
 
     $line = mysqli_fetch_array($result);
 
+    $isVIP = in_array($line['Staff'], ['VIP', 'RO', 'POM']);
     $line['Staff'] == "RO" ? $Rozhodci = "ANO" : $Rozhodci = "NE";
     $line['Staff'] == "POM" ? $Pomocnik = "ANO" : $Pomocnik = "NE";
 
@@ -376,12 +422,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_shooter'])) {
     $link_cancel = "<a href='$web_adresa_admin/zrus_ucast.php?id=$line[Cislo]&klic=$line[klic]'><strong>zrušit účast</strong></a>";
 
     // podmínky pro volbu textu v závislosti na statutu závodníka
-    if (($line['Staff'] == "VIP") or ($line['Staff'] == "RO") or ($line['Staff'] == "POM")) {
+    if ($isVIP) {
         $stmt = $conn->prepare("
 		UPDATE $table 
-		SET Zaplaceno = 'on',
-        Castka = '0',
-        CastkaZaplatit = '0',
+		SET Zaplaceno = 1,
+        Castka = 0,
+        CastkaZaplatit = 0,
         Mena = ?, 
         DatumZaplaceni = ?
         WHERE Cislo = ? and klic = ?
@@ -395,21 +441,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_shooter'])) {
         );
         $stmt->execute();
         $stmt->close();
-        $message = $email_registrace_bez_platby_text_admin_novy_zavodnik;
-    } elseif ($line['ZaplatiNaMiste'] == "on") {
-        $message = $email_registrace_platba_na_miste_admin_novy_zavodnik;
-    } elseif ($match_data['Payment_before'] == 'on') {
-        $message = $email_registrace_platba_text_admin_novy_zavodnik;
+        $message = $email_registrace_bez_platby_text_novy_zavodnik;
+    } elseif ($line['ZaplatiNaMiste'] == 1) {
+        $message = $email_registrace_platba_na_miste_novy_zavodnik;
+    } elseif ($match_data['Payment_before'] == 1) {
+        $message = $email_registrace_platba_text_novy_zavodnik;
     } else {
-        $message = $email_registrace_zavod_bez_platby_predem_admin;
+        $message = $email_registrace_zavod_bez_platby_predem;
     }
+
 
     // priprava podkladu pro e-mail zavodnikovi
     // nice názvy pro mail
     $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
-    // nice názvy pro mail
 
-    $STRELEC .= "Střelec: #" . $line['Cislo'] . " " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel]\r\n";
+    $STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel]\r\n";
     $STRELEC .= "Kategorie: $kategorie" . "\r\n";
     $STRELEC .= "Discpilína: $nazev_discipliny" . "\r\n\r\n";
     $STRELEC .= "<i>Rozhodčí: $Rozhodci" . "\r\n";
@@ -451,8 +497,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_shooter'])) {
         // zapiseme do DB, ze registracni mail byl odeslan
         $stmt = $conn->prepare("
 		UPDATE $table 
-		SET OdeslanRegMail = '1'
-		WHERE Mail = ? AND OdeslanRegMail IS NULL
+		SET OdeslanRegMail = 1
+		WHERE Mail = ? AND OdeslanRegMail = 0
 	        ");
         $stmt->bind_param(
             "s",
@@ -474,7 +520,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_shooter'])) {
         } else {
             $_SESSION['toast'] = [
                 'type' => 'success',
-                'message' => 'Závodník byl úspěšně přidán a registrační e-mail odeslán.',
+                'message' => 'Závodník byl úspěšně zaregistrován a registrační e-mail odeslán.',
                 'duration' => 2500
             ];
             header("refresh:0;url=index.php");
@@ -488,8 +534,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
     $alias = trim(mb_convert_case($_POST['Alias'], MB_CASE_UPPER, "UTF-8"));
     $jmeno = trim(mb_convert_case($_POST['Jmeno'], MB_CASE_TITLE, "UTF-8"));
     $prijmeni = trim(mb_convert_case($_POST['Prijmeni'], MB_CASE_TITLE, "UTF-8")) . $_POST['Prijmeni_stav'] . '';
+    $stav = (int) $_POST['Stav'];
     $op = normalizePrukaz($_POST['ObcanskyPrukaz'] ?? '');
-    $zo = isset($_POST['ZbrojniOpravneni']) ? 'on' : '';
+    $zo = isset($_POST['ZbrojniOpravneni']) ? 1 : 0;
     $email = trim($_POST['Mail']);
     $mena = $match_data['Banka_ucet_MENA'];
     $dnes = date_format(new DateTime(), "d.m.Y H:i");
@@ -510,15 +557,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
 
     //puvodni hodnoty
     $oldStaff = $line['Staff'];
-    $wasVIP = in_array($oldStaff, ['VIP','RO','POM']); 
-    $isVIP = in_array($_POST['Staff'], ['VIP','RO','POM']);
-
+    $oldStav = (int) $line['Stav'];
+    $wasVIP = in_array($oldStaff, ['VIP', 'RO', 'POM']);
+    $isVIP = in_array($_POST['Staff'], ['VIP', 'RO', 'POM']);
 
     $FeeStmt = $conn->prepare("SELECT * FROM $table_fee ORDER BY Count");
     $FeeStmt->execute();
     $feeValues = $FeeStmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $FeeStmt->close();
     $castka = $feeValues[0]['Value'];
+
+    // kontrola, zda stav již není obsazený - TO-DO
+
+    if ($oldStav != $stav) {
+
+        $ShiftStmt = $conn->prepare("
+        SELECT Stav FROM $table 
+        WHERE Stav = ?
+    ");
+        $ShiftStmt->bind_param("i", $stav);
+        $ShiftStmt->execute();
+        $rows = $ShiftStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $ShiftStmt->close();
+
+        if (count($rows) > 0) {
+            $_SESSION['toast'] = [
+                'type'    => 'danger',
+                'message' => 'Stav je již obsazen.',
+                'duration' => 2500
+            ];
+            header("Location: /");
+            exit;
+        }
+    }
 
 
     // editace vyrazeneho zavodnika (bez zmeny statutu)
@@ -530,6 +601,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
         UPDATE $table 
 		SET Jmeno = ?,
         Prijmeni = ?,
+        Stav = NULLIF(?,''),
         ObcanskyPrukaz = ?,
         ZbrojniOpravneni = ?,
         Mail = ?,
@@ -542,9 +614,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
         WHERE Cislo= ?
         ");
         $stmt->bind_param(
-            "sssssssssssi",
+            "ssisssssssssi",
             $jmeno,
             $prijmeni,
+            $_POST["Stav"],
             $op,
             $zo,
             $email,
@@ -566,6 +639,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
         UPDATE $table 
 		SET Jmeno = ?,
         Prijmeni = ?,
+        Stav = NULLIF(?,''),
         ObcanskyPrukaz = ?,
         ZbrojniOpravneni = ?,
         Mail = ?,
@@ -579,9 +653,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
         WHERE Cislo= ?
         ");
         $stmt->bind_param(
-            "ssssssssssssi",
+            "ssissssssssssi",
             $jmeno,
             $prijmeni,
+            $_POST["Stav"],
             $op,
             $zo,
             $email,
@@ -604,22 +679,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
         UPDATE $table 
 		SET Jmeno = ?,
         Prijmeni = ?,
+        Stav = NULLIF(?,''),
         ObcanskyPrukaz = ?,
         ZbrojniOpravneni = ?,
         Mail = ?,
         Kategorie = ?,
         Disciplina = ?,
         Staff = ?,
-        CastkaZaplatit = '0',
+        CastkaZaplatit = 0,
         Zaplaceno = NULLIF(?,''),
         ZaplatiNaMiste = NULLIF(?,''),
         Poznamka = ?
         WHERE Cislo= ?
         ");
         $stmt->bind_param(
-            "sssssssssssi",
+            "ssisssssssssi",
             $jmeno,
             $prijmeni,
+            $_POST["Stav"],
             $op,
             $zo,
             $email,
@@ -632,7 +709,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
             $_POST['shooterID']
         );
 
-        // editace aktivniho neplaticiho zavodnika - zmena statutu PAY --> nastavime CastkaZaplatit a zrusime Zaplaceno (NULL) a Castka (NULL)
+        // editace aktivniho neplaticiho zavodnika - zmena statutu PAY --> nastavime CastkaZaplatit a zrusime Zaplaceno 0 a Castka 0
     } else if (
         ($_POST['Disciplina'] != "VYRAZENO") &&
         $wasVIP &&
@@ -642,6 +719,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
         UPDATE $table
         SET Jmeno = ?,
             Prijmeni = ?,
+            Stav = NULLIF(?,''),
             ObcanskyPrukaz = ?,
             ZbrojniOpravneni = ?,
             Mail = ?,
@@ -649,16 +727,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
             Disciplina = ?,
             Staff = ?,
             CastkaZaplatit = ?,
-            Zaplaceno = NULL,
+            Zaplaceno = 0,
             Castka = NULL,
             ZaplatiNaMiste = NULLIF(?,''),
             Poznamka = ?
         WHERE Cislo = ?
     ");
         $stmt->bind_param(
-            "ssssssssissi",
+            "ssissssssissi",
             $jmeno,
             $prijmeni,
+            $_POST["Stav"],
             $op,
             $zo,
             $email,
@@ -679,22 +758,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
         UPDATE $table 
 		SET Jmeno = ?,
         Prijmeni = ?,
+        Stav = NULLIF(?,''),
         ObcanskyPrukaz = ?,
         ZbrojniOpravneni = ?,
         Mail = ?,
         Kategorie = ?,
         Disciplina = ?,
         Staff = ?,
-        CastkaZaplatit = '0',
+        CastkaZaplatit = 0,
         Zaplaceno = NULLIF(?,''),
         ZaplatiNaMiste = NULLIF(?,''),
         Poznamka = ?
         WHERE Cislo= ?
         ");
         $stmt->bind_param(
-            "sssssssssssi",
+            "ssisssssssssi",
             $jmeno,
             $prijmeni,
+            $_POST["Stav"],
             $op,
             $zo,
             $email,
@@ -711,6 +792,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
         UPDATE $table 
 		SET Jmeno = ?,
         Prijmeni = ?,
+        Stav = NULLIF(?,''),
         ObcanskyPrukaz = ?,
         ZbrojniOpravneni = ?,
         Mail = ?,
@@ -724,9 +806,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_shooter'])) {
         WHERE Cislo= ?
         ");
         $stmt->bind_param(
-            "ssssssssisssi",
+            "ssissssssisssi",
             $jmeno,
             $prijmeni,
+            $_POST["Stav"],
             $op,
             $zo,
             $email,
@@ -811,11 +894,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_shooter'])) {
         );
         exit;
     } else {
-        $_SESSION['toast'] = [
-            'type' => 'danger',
-            'message' => 'Závodník byl vyřazen.',
-            'duration' => 3000
-        ];
         header("refresh:0;url=index.php");
 
         // prepocitame castku k zaplaceni u hromadnych registraci
@@ -836,10 +914,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_shooter'])) {
             if (empty($rows)) {
                 $_SESSION['toast'] = [
                     'type'    => 'danger',
-                    'message' => 'Nenalezena žádná hromadná platba.',
+                    'message' => 'Nebyla nalezena žádná hromadná platba.',
                     'duration' => 2500
                 ];
-                header("Location: index.php");
+                header("Location: /");
                 exit;
             }
 
@@ -849,7 +927,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_shooter'])) {
             $feeValues = $FeeStmt->get_result()->fetch_all(MYSQLI_ASSOC);
             $FeeStmt->close();
 
-            // Pro každý řádek aktualizujeme castku u PAY zavodnika 
+            // 3) Pro každý řádek aktualizujeme castku u PAY zavodnika 
             if ($line['Staff'] == PAY) {
 
                 $updateStmt = $conn->prepare("
@@ -873,7 +951,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_shooter'])) {
                 $updateStmt->close();
             }
 
-            // Pokud zůstala jen jedna disciplína - změna bulkId na 0
+            // Pokud zůstala jen jedna disciplína → změna bulkId na 0
             if ($discCount === 1) {
                 $soloCislo = $rows[0]['Cislo'];
                 $bulkResetStmt = $conn->prepare("UPDATE $table SET bulkId = 0 WHERE Cislo = ?");
@@ -893,14 +971,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_shooter'])) {
         // nice názvy pro mail
         $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
 
-        $STRELEC .= "Střelec: #" . $line['Cislo'] . " " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
-        $STRELEC .= "Discpilína: $nazev_discipliny" . "\r\n";
+        $STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
+        $STRELEC .= "Kategorie: " . htmlspecialchars($line['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n";
+        $STRELEC .= "Disciplína: $nazev_discipliny" . "\r\n";
 
         $from_text = htmlspecialchars($match_data['Zavod_poradatel'], ENT_QUOTES, 'UTF-8');
-        $from = $match_data['Zavod_email_from'];
+        $from = htmlspecialchars($match_data['Zavod_email_from'], ENT_QUOTES, 'UTF-8');
         $to = $line['Mail'];
         $subject = "Zrušení registrace závodníka " . $match_data['Zavod'];
-        $message = $email_text_vyrazeni_admin;
+        $message = $email_text_vyrazeni;
         $message = str_replace("##STRELEC##", $STRELEC, $message);
 
         $send_email = email($from_text, $from, $to, $subject, $message);
@@ -911,9 +990,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_shooter'])) {
                 "Chyba odeslání e-mailu",
                 "index.php",
                 "Při odeslání e-mailu závodníkovi došlo k chybě.",
-                "Závodník byl zaregistrován, pro odstranění problému s odesíláním kontaktujte <a href='mailto:" . htmlspecialchars($vyvojar, ENT_QUOTES, 'UTF-8') . "?subject=" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . " - chyba odeslani e-mailu'>vývojáře</a> registračního systému.",
+                "Pro odstranění problému s odesíláním kontaktujte <a href='mailto:" . htmlspecialchars($vyvojar, ENT_QUOTES, 'UTF-8') . "?subject=" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . " - chyba odeslani e-mailu'>vývojáře</a> registračního systému.",
                 "Zpět do administrace"
             );
+        } else {
+            $_SESSION['toast'] = [
+                'type' => 'danger',
+                'message' => 'Závodník byl vyřazen a e-mail s informací odeslán.',
+                'duration' => 3000
+            ];
         }
     }
 }
@@ -950,15 +1035,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_shooter'])) {
     } else {
         $_SESSION['toast'] = [
             'type' => 'danger',
-            'message' => 'Závodník byl smazán.',
+            'message' => 'Závodník byl smazán a e-mail s informací o smazání odeslán.',
             'duration' => 3000
         ];
         header("refresh:0;url=index.php");
+
         //pri smazani zavodnika odešleme statistikovi mail
         $from = htmlspecialchars($match_data['Zavod_email_from'], ENT_QUOTES, 'UTF-8');
         $to = htmlspecialchars($match_data['Zavod_email_stats'], ENT_QUOTES, 'UTF-8');
         $subject = htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . " - smazání závodníka #" . $_POST['shooterID'];
-        $message = "V administraci závodu <strong>" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . "</strong> byl smazán závodník: #" . $line['Cislo'] . " " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " (" . $nazev_discipliny . ")." . "\r\n";
+        $message = "V administraci závodu <strong>" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . "</strong> smazal admin " . $_SESSION['name'] . " závodníka #" . $line['Cislo'] . " " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " (" . $nazev_discipliny . ")." . "\r\n";
         $send_email = email($from_text, $from, $to, $subject, $message);
     }
 }
@@ -978,7 +1064,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_paid'])) {
 
     $stmt = $conn->prepare("
     UPDATE $table 
-    SET Zaplaceno = 'on',
+    SET Zaplaceno = 1,
     Castka = ?,
     Mena = ?,
     DatumZaplaceni = ?
@@ -1006,22 +1092,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_paid'])) {
             "Zpět do administrace"
         );
     } else {
-        $_SESSION['toast'] = [
-            'type' => 'success',
-            'message' => 'Platba byla zaevidována.',
-            'duration' => 2500
-        ];
         header("refresh:0;url=index.php");
 
         // příprava mailu zavodnikovi
         // nice názvy pro mail
         $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
 
-        $STRELEC .= "Střelec: #" . $line['Cislo'] . " " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " \r\n";
+        $STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " \r\n";
+        $STRELEC .= "Kategorie: " . htmlspecialchars($line['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n";
         $STRELEC .= "Discpilína: $nazev_discipliny" . "\r\n";
 
-        $from_text = "";
-        $from = $match_data['Zavod_email_from'];
+        $from_text = htmlspecialchars($match_data['Zavod_poradatel'], ENT_QUOTES, 'UTF-8');
+        $from = htmlspecialchars($match_data['Zavod_email_from'], ENT_QUOTES, 'UTF-8');
         $to = $line['Mail'];
         $subject = "Evidence platby " . $match_data['Zavod'];
         $message = $email_text_platba;
@@ -1035,9 +1117,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_paid'])) {
                 "Chyba odeslání e-mailu",
                 "index.php",
                 "Při odeslání e-mailu závodníkovi došlo k chybě.",
-                "Závodník byl zaregistrován, pro odstranění problému s odesíláním kontaktujte <a href='mailto:" . htmlspecialchars($vyvojar, ENT_QUOTES, 'UTF-8') . "?subject=" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . " - chyba odeslani e-mailu'>vývojáře</a> registračního systému.",
+                "Platba byla zaevidována, pro odstranění problému s odesíláním kontaktujte <a href='mailto:" . htmlspecialchars($vyvojar, ENT_QUOTES, 'UTF-8') . "?subject=" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . " - chyba odeslani e-mailu'>vývojáře</a> registračního systému.",
                 "Zpět do administrace"
             );
+        } else {
+            $_SESSION['toast'] = [
+                'type' => 'success',
+                'message' => 'Platba byla zaevidována a e-mail závodníkovi odeslán.',
+                'duration' => 2500
+            ];
         }
     }
 }
@@ -1048,9 +1136,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_bulk_payment']))
     $bulkId = $_POST['shooterBULK'];
 
     $stmt = $conn->prepare("
-        SELECT Cislo, Jmeno, Prijmeni, Mail, Disciplina, klic
+        SELECT Cislo, Jmeno, Prijmeni, Mail, Disciplina, Kategorie, klic
         FROM $table
-        WHERE bulkId = ? AND Zaplaceno IS NULL AND Disciplina != 'VYRAZENO' ORDER BY Cislo
+        WHERE bulkId = ? AND Zaplaceno = 0 AND Disciplina != 'VYRAZENO' ORDER BY Cislo
    ");
     $stmt->bind_param("i", $bulkId);
     $stmt->execute();
@@ -1060,10 +1148,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_bulk_payment']))
     if (empty($rows)) {
         $_SESSION['toast'] = [
             'type'    => 'danger',
-            'message' => 'Nenalezena žádná hromadná platba.',
+            'message' => 'Nebyla nalezena žádná hromadná platba.',
             'duration' => 2500
         ];
-        header("Location: index.php");
+        header("Location: /");
         exit;
     }
 
@@ -1089,7 +1177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_bulk_payment']))
         UPDATE $table
         SET Castka = ?,
             DatPay = ?,
-            Zaplaceno = 'on',
+            Zaplaceno = 1,
             Mena = ?
         WHERE Cislo = ?
     ");
@@ -1107,15 +1195,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_bulk_payment']))
         $updateStmt->execute();
     }
     $updateStmt->close();
-    $_SESSION['toast'] = [
-        'type' => 'success',
-        'message' => 'Hromadný platba byla zaevidována.',
-        'duration' => 2000
-    ];
     header("refresh:0;url=index.php");
 
     // příprava mailu zavodnikovi
-    $STRELEC = "Střelec: " . htmlspecialchars($rows[0]['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($rows[0]['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
+    $STRELEC = "Závodník: " . htmlspecialchars($rows[0]['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($rows[0]['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
+    $STRELEC .= "Kategorie: " . htmlspecialchars($rows[0]['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n\r\n";
     $STRELEC .= "Disciplíny:\r\n";
 
     foreach ($rows as $i => $r) {
@@ -1131,12 +1215,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_bulk_payment']))
     }
 
     $from_text = htmlspecialchars($match_data['Zavod_poradatel'], ENT_QUOTES, 'UTF-8');
-    $from = $match_data['Zavod_email_from'];
+    $from = htmlspecialchars($match_data['Zavod_email_from'], ENT_QUOTES, 'UTF-8');
     $to = $rows[0]['Mail'];
     $subject = "Evidence hromadné platby " . $match_data['Zavod'];
     $message = $email_text_hromadna_platba;
     $message = str_replace("##STRELEC##", $STRELEC, $message);
-    $message = str_replace("##CELKOVA_CASTKA##", number_format($celkovaCastka, 2, ',', ' '), $message);
+    $message = str_replace("##CASTKA##", number_format($celkovaCastka, 2, ',', ' '), $message);
 
     $send_email = email($from_text, $from, $to, $subject, $message);
     if (!$send_email) {
@@ -1146,14 +1230,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_bulk_payment']))
             "Chyba odeslání e-mailu",
             "index.php",
             "Při odeslání e-mailu závodníkovi došlo k chybě.",
-            "Závodník byl zaregistrován, pro odstranění problému s odesíláním kontaktujte <a href='mailto:" . htmlspecialchars($vyvojar, ENT_QUOTES, 'UTF-8') . "?subject=" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . " - chyba odeslani e-mailu'>vývojáře</a> registračního systému.",
+            "Hromadná platba byla zaevidována, pro odstranění problému s odesíláním kontaktujte <a href='mailto:" . htmlspecialchars($vyvojar, ENT_QUOTES, 'UTF-8') . "?subject=" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . " - chyba odeslani e-mailu'>vývojáře</a> registračního systému.",
             "Zpět do administrace"
         );
+    } else {
+        $_SESSION['toast'] = [
+            'type' => 'success',
+            'message' => 'Hromadná platba byla zaevidována a e-mail závodníkovi odeslán.',
+            'duration' => 2000
+        ];
     }
 }
 
-
-// NOVY UZIVATEL ADMINISTRACE
+// NOVY UZIVATEL
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_user'])) {
     $username = $_POST['Username'] ?? '';
     $password = $_POST['Heslo'] ?? '';
@@ -1163,10 +1252,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_user'])) {
     $role = $_POST['Role'] ?? 'viewer';
     $poradatel = $_POST['Organizer'] ?? '';
 
+    //deaktivovana kontrola hesla
+    //    if ($username && $password ) { 
+
     if ($username && $password && isValidPassword($password)) {
         $hash = password_hash($password, PASSWORD_DEFAULT);
 
-        $stmt = $conn->prepare("INSERT INTO site_admins (username, email, password, firstname, lastname, role, organizer) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO $table_admins (username, email, password, firstname, lastname, role, organizer) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("sssssss", $username, $email,  $hash, $jmeno, $prijmeni, $role, $poradatel);
         $stmt->execute();
         $stmt->close();
@@ -1190,13 +1282,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_user'])) {
             "Zpět do administrace"
         );
     } else {
-        $_SESSION['toast'] = [
-            'type' => 'success',
-            'message' => 'Uživatel byl úspěšně přidán.',
-            'duration' => 2000
-        ];
         header("Location: index.php?users");
-        //odešleme uživateli mail
+
+        // odešleme uživateli mail
         $UZIVATEL .= "<strong>Jméno pro přihlášení:</strong> " . $username  . "\r\n";
         $UZIVATEL .= "<strong>Heslo:</strong> pošle administrátor jinou cestou \r\n";
         $UZIVATEL .= "<strong>Role:</strong> " . $role . " " . $admin_roles[$role] . "\r\n";
@@ -1205,9 +1293,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_user'])) {
         $from = htmlspecialchars($match_data['Zavod_email_from'], ENT_QUOTES, 'UTF-8');
         $to = $email;
         $subject = "SSAŠ střelnice Prachatice - přístupové údaje do administrace registračního systému soutěží";
-        $message = "$email_admin_novy_uzivatel";
+        $message = "$email_novy_uzivatel";
         $message = str_replace("##UZIVATEL##", $UZIVATEL, $message);
         $send_email = email($from_text, $from, $to, $subject, $message);
+
+        if (!$send_email) {
+            include './components/modal-warning.php';
+            WarningModal(
+                "danger",
+                "Chyba odeslání e-mailu",
+                "index.php",
+                "Při odeslání e-mailu závodníkovi došlo k chybě.",
+                "Uživatel byl přidán, pro odstranění problému s odesíláním kontaktujte <a href='mailto:" . htmlspecialchars($vyvojar, ENT_QUOTES, 'UTF-8') . "?subject=" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . " - chyba odeslani e-mailu'>vývojáře</a> registračního systému.",
+                "Zpět do administrace"
+            );
+        } else {
+            $_SESSION['toast'] = [
+                'type' => 'success',
+                'message' => 'Uživatel byl přidán a e-mail s informací odeslán.',
+                'duration' => 2000
+            ];
+        }
     }
 }
 
@@ -1215,7 +1321,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_user'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
 
     // Získání role uživatele, který má být smazán
-    $stmt = $conn->prepare("SELECT role FROM site_admins WHERE username = ?");
+    $stmt = $conn->prepare("SELECT role FROM $table_admins WHERE username = ?");
     $stmt->bind_param("s", $_POST['username']);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -1225,7 +1331,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
 
     // Pokud uzivatel admin, zkontrolujeme, kolik jich zbývá
     if ($userData['role'] === 'admin') {
-        $stmt = $conn->prepare("SELECT COUNT(*) as pocet FROM site_admins WHERE role = 'admin'");
+        $stmt = $conn->prepare("SELECT COUNT(*) as pocet FROM $table_admins WHERE role = 'admin'");
         $stmt->execute();
         $result = $stmt->get_result();
         $stmt->close();
@@ -1243,7 +1349,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     }
 
     $stmt = $conn->prepare("
-		SELECT username, firstname, lastname, email FROM site_admins
+		SELECT username, firstname, lastname, email FROM $table_admins
 		WHERE username = ?
 	 ");
     $stmt->bind_param(
@@ -1257,7 +1363,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
 
 
     $stmt = $conn->prepare("
-        DELETE FROM site_admins
+        DELETE FROM $table_admins
         WHERE username = ?
 	");
     $stmt->bind_param(
@@ -1279,19 +1385,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
             "Zpět do administrace"
         );
     } else {
-        $_SESSION['toast'] = [
-            'type' => 'danger',
-            'message' => 'Uživatel byl smazán.',
-            'duration' => 3000
-        ];
         header("Location: index.php?users");
 
         //pri smazani uživatele odešleme statistikovi mail
         $from = htmlspecialchars($match_data['Zavod_email_from'], ENT_QUOTES, 'UTF-8');
         $to = htmlspecialchars($match_data['Zavod_email_stats'], ENT_QUOTES, 'UTF-8');
         $subject = htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . " - smazání uživatele " . $_POST['username'];
-        $message = "V administraci závodu <strong>" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . "</strong> byl smazán uživatel: " . htmlspecialchars($line['firstname'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['lastname'], ENT_QUOTES, 'UTF-8') . " - " . htmlspecialchars($line['email'], ENT_QUOTES, 'UTF-8') . "\r\n";
+        $message = "V administraci závodu <strong>" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . "</strong> smazal admin " . $_SESSION['name'] . "  uživatele: " . htmlspecialchars($line['firstname'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['lastname'], ENT_QUOTES, 'UTF-8') . " - " . htmlspecialchars($line['email'], ENT_QUOTES, 'UTF-8') . "\r\n";
         $send_email = email($from_text, $from, $to, $subject, $message);
+
+        if (!$send_email) {
+            include './components/modal-warning.php';
+            WarningModal(
+                "danger",
+                "Chyba odeslání e-mailu",
+                "index.php",
+                "Při odeslání e-mailu statistikovi došlo k chybě.",
+                "Uživatel byl smazán, pro odstranění problému s odesíláním kontaktujte <a href='mailto:" . htmlspecialchars($vyvojar, ENT_QUOTES, 'UTF-8') . "?subject=" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . " - chyba odeslani e-mailu'>vývojáře</a> registračního systému.",
+                "Zpět do administrace"
+            );
+        } else {
+            $_SESSION['toast'] = [
+                'type' => 'danger',
+                'message' => 'Uživatel byl smazán a e-mail statistikovi odeslán.',
+                'duration' => 2500
+            ];
+        }
     }
 }
 
@@ -1303,7 +1422,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_change'])) {
     $passwordVerify = $_POST['password_new1'] ?? '';
 
     if ($username) {
-        $stmt = $conn->prepare("SELECT password FROM site_admins WHERE username = ?");
+        $stmt = $conn->prepare("SELECT password FROM $table_admins WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -1319,7 +1438,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_change'])) {
                     'message' => 'Původní heslo není správné.',
                     'duration' => 2500
                 ];
-                header("Location: index.php");
+                header("Location: /");
                 exit();
             }
 
@@ -1330,7 +1449,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_change'])) {
                     'message' => 'Hesla se neshodují.',
                     'duration' => 2500
                 ];
-                header("Location: index.php");
+                header("Location: /");
                 exit();
             }
 
@@ -1341,7 +1460,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_change'])) {
                     'message' => 'Nové heslo je stejné jako původní.',
                     'duration' => 2500
                 ];
-                header("Location: index.php");
+                header("Location: /");
                 exit();
             }
 
@@ -1353,13 +1472,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_change'])) {
                     'message' => $errorMessage,
                     'duration' => 2500
                 ];
-                header("Location: index.php");
+                header("Location: /");
                 exit();
             }
 
+
+            // ulož nový hash
             $hash = password_hash($passwordNew, PASSWORD_DEFAULT);
-            $updateStmt = $conn->prepare("UPDATE site_admins SET password = ? WHERE username = ?");
-            $updateStmt->bind_param("ss", $hash, $username);
+            $updateStmt = $conn->prepare("
+                UPDATE $table_admins 
+                SET password = ?,
+                last_password_change = NOW()
+                WHERE username = ?");
+            $updateStmt->bind_param(
+                "ss",
+                $hash,
+                $username
+            );
             $updateStmt->execute();
             $updateStmt->close();
 
@@ -1368,7 +1497,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password_change'])) {
                 'message' => 'Heslo bylo úspěšně změněno.',
                 'duration' => 2000
             ];
-            header("Location: index.php");
+            header("Location: /");
             exit();
         }
     }
@@ -1408,7 +1537,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_discipline'])) {
             'message' => 'Disciplína byla úspěšně přidána.',
             'duration' => 2000
         ];
-
         header("Location: index.php?disciplines");
     }
 }
@@ -1479,7 +1607,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_fee'])) {
             'message' => 'Startovné bylo úspěšně přidáno.',
             'duration' => 2000
         ];
-
         header("Location: index.php?fee");
     }
 }
@@ -1527,22 +1654,73 @@ if (isset($_POST['update'])) {
     $id = intval($_POST['id']);
     $value = $_POST['value'];
 
-    // Povolené tabulky a pole
     $allowedTables = [
-        'site_admins' => ['username', 'email', 'role', 'firstname', 'lastname', 'organizer'],
-        $table_disciplines => ['Name', 'Value', 'Description'],
+        '$table_admins' => ['username', 'email', 'role', 'firstname', 'lastname', 'organizer', 'password', 'force_password_change'],
+        $table_disciplines => ['Name', 'Value', 'Description', 'Shift_from', 'Shift_to'],
         $table_fee => ['Value']
-
     ];
 
     if (array_key_exists($table, $allowedTables) && in_array($field, $allowedTables[$table])) {
-        $stmt = $conn->prepare("UPDATE `$table` SET `$field` = ? WHERE id = ?");
-        $stmt->bind_param("si", $value, $id);
+
+        // zmena hesla
+        if ($table === '$table_admins' && $field === 'password') {
+            // prazdny input
+            if (trim($value) === '') {
+                $_SESSION['toast'] = [
+                    'type' => 'danger',
+                    'message' => 'Není možné nastavit prázdné heslo. Opakujte změnu hesla a zadejte heslo vyhovující požadavkům na sílu hesla.',
+                    'duration' => 3000
+                ];
+            exit;
+            }
+            $hash = password_hash($value, PASSWORD_DEFAULT);
+
+            $stmt = $conn->prepare("
+                UPDATE $table_admins 
+                SET password = ?, last_password_change = NOW() , force_password_change = 1
+                WHERE id = ?
+            ");
+            $stmt->bind_param("si", $hash, $id);
+        } else {
+            // bezny update
+            $stmt = $conn->prepare("UPDATE `$table` SET `$field` = ? WHERE id = ?");
+            $stmt->bind_param("si", $value, $id);
+        }
+
         $stmt->execute();
         $stmt->close();
     }
+
     exit;
 }
+
+// vyprazdneni tabulky zavodniku
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['truncate_table'])) {
+
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+        http_response_code(403);
+        exit('Nemáte oprávnění');
+    }
+
+    if (
+        empty($_POST['csrf_token']) ||
+        empty($_SESSION['csrf_token']) ||
+        !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])
+    ) {
+        exit('Neplatný CSRF token.');
+    }
+
+    $conn->query("TRUNCATE TABLE `$table`");
+
+    $_SESSION['toast'] = [
+        'type' => 'danger',
+        'message' => 'Tabulka závodníků byla úspěšně vyprázdněna. Závodníci se budou přidávat s číslem od 1 ',
+        'duration' => 2500
+    ];
+    header("Location: /");
+    exit;
+}
+
 ?>
 
 <script type='text/javascript'>

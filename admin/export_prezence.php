@@ -1,12 +1,10 @@
 <?php
-session_start();
-if (!isset($_SESSION['loggedin'])) {
-    header('Location: ../index.php');
-    exit;
-}
+require_once __DIR__ . '/session_init.php';
+require_once __DIR__ . '/config/data.php';
+require_once __DIR__ . '/db/dbconn.php';
+require_admin();
 
-require_once __DIR__ . '/../db/dbconn.php';
-require_once '../libs/PhpSpreadsheet/vendor/autoload.php';
+require_once __DIR__ . '/libs/PhpSpreadsheet/vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -20,22 +18,24 @@ use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 $stmt = $conn->prepare("
     SELECT 
         Cislo,
-        CONCAT(Prijmeni, ' ', Jmeno) AS PrijmeniJmeno,
-        TRIM(CONCAT(ObcanskyPrukaz,' ',IF(ZbrojniOpravneni = 'on', '(zo)', ''))) AS `Občanský průkaz`,
+        CASE WHEN Prijmeni LIKE '% %' THEN CONCAT(SUBSTRING_INDEX(Prijmeni, ' ', 1), ' ', Jmeno, ' ', SUBSTRING_INDEX(Prijmeni, ' ', -1)) ELSE CONCAT(Prijmeni, ' ', Jmeno) END AS PrijmeniJmeno,
+        Stav,
+        TRIM(CONCAT(ObcanskyPrukaz,' ',IF(ZbrojniOpravneni = 1, '(zo)', ''))) AS `Občanský průkaz`,
         CisloZbrane,
+        NazevZbrane,
         Disciplina,
         CastkaZaplatit,
         Poznamka
     FROM $table
     WHERE Vyrazeno IS NULL
-    ORDER BY PrijmeniJmeno, `Občanský průkaz`, Cislo
+    ORDER BY PrijmeniJmeno, ObcanskyPrukaz, Cislo
 ");
 $stmt->execute();
 $result = $stmt->get_result();
 $data = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-$result_match = $conn->query("SELECT Zavod FROM match_config WHERE Zavod_id='$table' LIMIT 1");
+$result_match = $conn->query("SELECT Zavod FROM $table_matches WHERE Zavod_id='$table' LIMIT 1");
 $match_data = $result_match->fetch_array();
 
 // ================= EXCEL =================
@@ -87,7 +87,7 @@ $sheet->getStyle('A2')->getAlignment()
 
 // řádek 3 – hlavička tabulky
 $sheet->fromArray(
-    ['', 'Příjmení, Jméno', 'OP / EZP', 'CisloZbrane','Disciplína', 'Směna', 'Startovné', 'Podpis', 'Poznámka'],
+    ['', 'Příjmení, Jméno', 'OP / EZP', 'CisloZbrane','Disciplína', 'Stav', 'Startovné', 'Podpis', 'Poznámka'],
     null,
     'A3'
 );
@@ -104,7 +104,7 @@ foreach ($data as $line) {
             $line['Občanský průkaz'],
             $line['CisloZbrane'],
             $line['Disciplina'],
-            '',
+            $line['Stav'],
             $line['CastkaZaplatit'],
             '',
             $line['Poznamka']

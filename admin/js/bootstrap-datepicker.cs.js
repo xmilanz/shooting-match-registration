@@ -1,5 +1,5 @@
 $.fn.datepicker.dates['cs'] = {
-    days: ["Neděle", "Pondšlí", "Úterý", "tředa", "Čtvrtek", "Pátek", "Sobota"],
+    days: ["Neděle", "Pondělí", "Úterý", "tředa", "Čtvrtek", "Pátek", "Sobota"],
     daysShort: ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"],
     daysMin: ["Ne", "Po", "Út", "St", "Čt", "Pá", "So"],
     months: ["Leden", "Únor", "Březen", "Duben", "Květen", "Červen", "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec"],

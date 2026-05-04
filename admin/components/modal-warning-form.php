@@ -11,6 +11,8 @@ function WarningModalForm(
     string $SubmitLabel = 'Potvrdit',
     string $CancelLabel = 'Zrušit'
 ): void {
+
+    // Ošetření vstupů pro bezpečnost
     $WarnColor = htmlspecialchars($Color, ENT_QUOTES, 'UTF-8');
     $WarnHeader = htmlspecialchars($Header, ENT_QUOTES, 'UTF-8');
     $WarnCloseHref = htmlspecialchars($CloseHref, ENT_QUOTES, 'UTF-8');
@@ -28,6 +30,8 @@ function WarningModalForm(
             <form method='post' action='$WarnActionURL'>
     ";
 
+
+    // Skryté inputy (např. ID a klic)
     foreach ($HiddenFields as $name => $value) {
         $safeName = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
         $safeValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
@@ -38,7 +42,7 @@ function WarningModalForm(
         <div class='fw-bolder text-$WarnColor'>
             $WarnMessage
         </div>
-            <div class='bd-callout-info fw-normal text-center my-3 mx-2'>
+            <div class='alert alert-info fw-normal text-center my-3 mx-2' role='alert'>
                 $WarnExtraInfo
             </div>
         <div class='modal-footer border-top-0'>

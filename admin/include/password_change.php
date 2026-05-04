@@ -49,7 +49,7 @@
                     </div>
             </div>
 
-            <div class="modal-footer match_config border-top-0">
+            <div class="modal-footer border-top-0">
                 <button type="submit" name="password_change" value="1" class="btn btn-secondary">Změnit heslo</button>
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.href = 'index.php';">Zrušit</button>
             </div>
@@ -60,10 +60,13 @@
 </div>
 
 <script>
+    // Disable form submissions if there are invalid fields
     (function() {
         'use strict';
         window.addEventListener('load', function() {
+            // Get the forms we want to add validation styles to
             var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
             var validation = Array.prototype.filter.call(forms, function(form) {
                 form.addEventListener('submit', function(event) {
                     if (form.checkValidity() === false) {
@@ -76,6 +79,7 @@
         }, false);
     })();
 </script>
+
 
 <script>
     document.querySelectorAll(".toggle-password").forEach(icon => {

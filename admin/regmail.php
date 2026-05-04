@@ -1,12 +1,8 @@
 <?php
-session_start();
-if (!isset($_SESSION['loggedin'])) {
-    header('Location: ../index.php');
-    exit;
-}
-
-require_once("../db/dbconn.php");
-require_once("../config/data.php");
+require_once __DIR__ . '/session_init.php';
+require_once __DIR__ . '/config/data.php';
+require_once __DIR__ . '/db/dbconn.php';
+require_admin();
 
 $shooterID = intval($_GET['ID']);
 $shooterKEY = intval($_GET['KEY']);
@@ -23,8 +19,8 @@ WarningModalForm(
         "shooterID" => $shooterID,
         "shooterKEY" => $shooterKEY
     ],
-    "Opravdu chcete poslat závodníkovi <br>#" . $line['Cislo'] . " " . htmlspecialchars($line['Jmeno']) . " " . htmlspecialchars($line['Prijmeni']) . " (" . $nazev_discipliny . ") registrační mail?",
-    "Znovu pošleme registrační e-mail (informace o závodu,...).",
+    "Opravdu chcete poslat závodníkovi<br> " . htmlspecialchars($line['Jmeno']) . " " . htmlspecialchars($line['Prijmeni']) . " (" . $nazev_discipliny . ") registrační mail?",
+    "Znovu pošleme registrační e-mail (informace o závodu,<br>QR kód pro zaplacení,...).",
     "./send.php",
     "regmail",
     "Odeslat registrační mail"

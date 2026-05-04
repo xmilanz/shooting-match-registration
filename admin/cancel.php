@@ -1,12 +1,8 @@
 <?php
-session_start();
-if (!isset($_SESSION['loggedin'])) {
-    header('Location: ../index.php');
-    exit;
-}
-
-require_once("../db/dbconn.php");
-require_once("../config/data.php");
+require_once __DIR__ . '/session_init.php';
+require_once __DIR__ . '/config/data.php';
+require_once __DIR__ . '/db/dbconn.php';
+require_admin();
 
 $shooterID = intval($_GET['ID']);
 $shooterKEY = intval($_GET['KEY']);
@@ -23,9 +19,9 @@ WarningModalForm(
         "shooterID" => $shooterID,
         "shooterKEY" => $shooterKEY
     ],
-    "Opravdu chcete vyřadit závodníka<br>#" . $line['Cislo'] . " " . htmlspecialchars($line['Jmeno']) . " " . htmlspecialchars($line['Prijmeni']) . " (" . $nazev_discipliny . ")?",
-    "Závodník nebude odstraněn, pouze se změní statut na VYŘAZENO.",
+    "Opravdu chcete vyřadit závodníka " . htmlspecialchars($line['Jmeno']) . " " . htmlspecialchars($line['Prijmeni']) . " (" . $nazev_discipliny . ")?",
+    "Závodník nebude odstraněn, ale změní se statut na VYŘAZENO.",
     "./save.php",
     "cancel_shooter",
-    "Vyřadit závodníka"
+    "Vyřadit závodníka",
 );

@@ -1,18 +1,14 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <?php
+require_once __DIR__ . '/session_init.php';
+require_once __DIR__ . '/db/dbconn.php';
+require_once __DIR__ . '/config/mail_texty.php';
+require_admin();
 
-session_start();
-if (!isset($_SESSION['loggedin'])) {
-    header('Location: ../index.php');
-    exit();
-}
-
-require_once __DIR__ . '/../db/dbconn.php';
-require_once __DIR__ . '/../config/mail_texty.php';
 
 $stmt = $conn->prepare("
-SELECT * FROM match_config
+SELECT * FROM $table_matches
       WHERE Zavod_id = ?
    ");
 $stmt->bind_param(
@@ -31,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['regmail'])) {
 
     $disciplina = $line['Disciplina'];
     $varsymbol = $line['VarSym'];
+    $isVIP = in_array($line['Staff'], ['VIP', 'RO', 'POM']);
 
     $link_cancel = "<a href='$web_adresa_admin/zrus_ucast.php?id=$line[Cislo]&klic=$line[klic]'><strong>zrušit účast</strong></a>";
 
@@ -51,14 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['regmail'])) {
     }
 
     // podmínky pro volbu textu v závislosti na statutu závodníka
-    if (($line['Staff'] == "VIP") or ($line['Staff'] == "RO") or ($line['Staff'] == "POM")) {
-        $message = $email_registrace_bez_platby_text_admin;
-    } elseif ($line['ZaplatiNaMiste'] == "on") {
-        $message = $email_registrace_platba_na_miste_admin;
-    } elseif ($match_data['Payment_before'] == 'on') {
-        $message = $email_registrace_platba_text_admin;
+    if ($isVIP) {
+        $message = $email_registrace_bez_platby_text;
+    } else if ($line['ZaplatiNaMiste'] == "1") {
+        $message = $email_registrace_platba_na_miste;
+    } else if ($match_data['Payment_before'] == "1") {
+        $message = $email_registrace_platba_text;
     } else {
-        $message = $email_registrace_zavod_bez_platby_predem_text_admin;
+        $message = $email_registrace_zavod_bez_platby_predem_text;
     }
 
     // priprava e-mailu zavodnikovi
@@ -71,7 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['regmail'])) {
     // nice názvy pro mail
     $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
 
-    $STRELEC .= "Střelec: #" . $line['Cislo'] . " " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel]\r\n";
+    $STRELEC = "Závodník:" . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel]\r\n";
+    $STRELEC .= "Kategorie: " . htmlspecialchars($line['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n";
     $STRELEC .= "Disciplína: $nazev_discipliny" . "\r\n\r\n";
     $STRELEC .= "<i>Rozhodčí: $Rozhodci" . "\r\n";
     $STRELEC .= "Pomocník: $Pomocnik</i>" . "\r\n\r\n";
@@ -118,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['regmail'])) {
         ];
 
         header("refresh:0;url=index.php");
-        // informace o e-mailu zaslaneho z administrace se do databaze nezapisuje
+        // informace o e-mailu zaslaném z administrace se do databaze nezapisuje
     }
 }
 
@@ -128,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_regmail'])) {
     $bulkId = $_POST['shooterBULK'];
 
     $stmt = $conn->prepare("
-        SELECT Cislo, Jmeno, Prijmeni, Mail, Disciplina, klic, VarSym, DatReg, DatPay, Poznamka
+        SELECT Cislo, Jmeno, Prijmeni, Staff, Mail, Disciplina, Kategorie, klic, VarSym, DatReg, DatPay, Poznamka
         FROM $table
         WHERE bulkId = ? AND Disciplina !='VYRAZENO'
         ORDER BY Cislo
@@ -148,10 +146,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_regmail'])) {
     if (empty($rows)) {
         $_SESSION['toast'] = [
             'type'    => 'danger',
-            'message' => 'Nenzalezena žádná hromadná platba.',
-            'duration'=> 2500
+            'message' => 'Nebyla nalezena žádná hromadná platba.',
+            'duration' => 2500
         ];
-        header("Location: index.php");
+        header("Location: /");
         exit;
     }
     $cisla_disc_odkazy = [];
@@ -177,11 +175,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_regmail'])) {
     $paymentDeadline = $rows[0]['DatPay'];
     $datumRegistraceZavodnika = new DateTime();
     $datumRegistraceZavodnika->setTimestamp($rows[0]['DatReg'])->format('d.m.Y');
+    $isVIP = in_array($rows[0]['Staff'], ['VIP', 'RO', 'POM']);
 
-    $STRELEC = "Střelec: " . htmlspecialchars($rows[0]['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($rows[0]['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
+
+    $STRELEC = "Závodník: " . htmlspecialchars($rows[0]['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($rows[0]['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
+    $STRELEC .= "Kategorie: " . htmlspecialchars($row['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n\r\n";
     $STRELEC .= "Disciplíny:\r\n";
     foreach ($cisla_disc_odkazy as $i => $r) {
-        if (($staff == "RO") or ($staff == "POM")) {
+        //        if (($staff == "RO") or ($staff == "POM")) { 
+        if ($isVIP) {
             $castka = 0;
         } elseif ($i === 0) {
             $castka = $feeValues[0]['Value'];
@@ -190,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_regmail'])) {
         } else {
             $castka = $feeValues[2]['Value'];
         }
-        $STRELEC .= "&nbsp;&nbsp;- #" . $r['cislo'] . " " . $r['nazev'] . "  (" . number_format($castka, 2, ',', ' ') . " " . $match_data['Banka_ucet_MENA'] . ") [" . $r['link'] . "]\r\n";
+        $STRELEC .= "&nbsp;&nbsp;- " . $r['nazev'] . "  (" . number_format($castka, 2, ',', ' ') . " " . $match_data['Banka_ucet_MENA'] . ") [" . $r['link'] . "]\r\n";
         $STRELEC .= "&nbsp;&nbsp;- Poznámka: " . $r['poznamka'] . "</i>" . "\r\n\r\n";
     }
 
@@ -221,17 +223,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_regmail'])) {
     $subject = "Registrace " . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8');
 
     // podmínky pro volbu textu v závislosti na statutu závodníka
-    if ($line['ZaplatiNaMiste'] == "on") {
-        $message = $email_registrace_platba_na_miste_admin;
-    } elseif ($match_data['Payment_before'] == 'on') {
-        $message = $email_hromadna_registrace_platba_text_admin;
+    if ($line['ZaplatiNaMiste'] == "1") {
+        $message = $email_registrace_platba_na_miste;
+    } elseif ($match_data['Payment_before'] == 1) {
+        $message = $email_hromadna_registrace_platba_text;
     } else {
-        $message = $email_hromadna_registrace_zavod_bez_platby_predem_text_admin;
+        $message = $email_hromadna_registrace_zavod_bez_platby_predem_text;
     }
 
     $message = str_replace("##STRELEC##", $STRELEC, $message);
     $message = str_replace("##VAR_SYMBOL##", $varsymbol, $message);
-    $message = str_replace("##CELKOVA_CASTKA##", number_format($celkovaCastka, 2, ',', ' '), $message);
+    $message = str_replace("##CASTKA##", number_format($celkovaCastka, 2, ',', ' '), $message);
     $message = str_replace("##QR_LINK##", $qr_link, $message);
     $message = str_replace("##DatReg##", $datumRegistraceZavodnika->format('d.m.Y'), $message);
     $message = str_replace("##DatPay##", $paymentDeadline, $message);
@@ -256,7 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_regmail'])) {
         ];
 
         header("refresh:0;url=index.php");
-        // informace o e-mailu zaslaneho z administrace se do databaze nezapisuje
+        // informace o e-mailu zaslaném z administrace se do databaze nezapisuje
     }
 }
 
@@ -295,8 +297,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_warn'])) {
 
     // nice názvy pro mail
     $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
+    // nice názvy pro mail
 
-    $STRELEC .= "Střelec: #" . $line['Cislo'] . " " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel]\r\n";
+    $STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel]\r\n";
+    $STRELEC .= "Kategorie: " . htmlspecialchars($line['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n";
     $STRELEC .= "Disciplína: $nazev_discipliny" . "\r\n\r\n";
     $STRELEC .= "<i>Rozhodčí: $Rozhodci" . "\r\n";
     $STRELEC .= "Pomocník: $Pomocnik</i>" . "\r\n";
@@ -318,7 +322,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['payment_warn'])) {
     $to = $line['Mail'];
     $subject = "Chybějící platba " . $match_data['Zavod'];
 
-    $message = $email_urgence_platba_text_admin;
+    $message = $email_urgence_platba_text;
     $message = str_replace("##STRELEC##", $STRELEC, $message);
     $message = str_replace("##VAR_SYMBOL##", $varsymbol, $message);
     $message = str_replace("##CASTKA##", number_format($feeValues[0]['Value'], 2, ',', ' '), $message);
@@ -383,9 +387,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_payment_warn']))
     $dnes = date_format(new DateTime(), "d.m.Y H:i");
 
     $stmt = $conn->prepare("
-        SELECT Cislo, Jmeno, Prijmeni, Mail, Disciplina, klic, VarSym, DatReg
+        SELECT Cislo, Jmeno, Prijmeni, Mail, Disciplina, Kategorie, klic, VarSym, DatReg
         FROM $table
-        WHERE bulkId = ? AND Zaplaceno IS NULL AND Disciplina !='VYRAZENO'
+        WHERE bulkId = ? AND Zaplaceno = 0 AND Disciplina !='VYRAZENO'
         ORDER BY Cislo
    ");
     $stmt->bind_param("i", $bulkId);
@@ -396,10 +400,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_payment_warn']))
     if (empty($rows)) {
         $_SESSION['toast'] = [
             'type'    => 'danger',
-            'message' => 'Nenalezena žádná hromadná platba.',
-            'duration'=> 2500
+            'message' => 'Nebyla nalezena žádná hromadná platba.',
+            'duration' => 2500
         ];
-        header("Location: index.php");
+        header("Location: /");
         exit;
     }
 
@@ -456,7 +460,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_payment_warn']))
     $feeValues = $FeeStmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $FeeStmt->close();
 
-    $STRELEC = "Střelec: " . htmlspecialchars($rows[0]['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($rows[0]['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
+    $STRELEC = "Závodník " . htmlspecialchars($rows[0]['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($rows[0]['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
+    $STRELEC .= "Kategorie: " . htmlspecialchars($rows[0]['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n\r\n";
     $STRELEC .= "Disciplíny:\r\n";
     foreach ($cisla_disc_odkazy as $i => $r) {
         if ($i === 0) {
@@ -466,7 +471,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_payment_warn']))
         } else {
             $castka = $feeValues[2]['Value'];
         }
-        $STRELEC .= "- #" . $r['cislo'] . " " . $r['nazev'] . " (" . number_format($castka, 2, ',', ' ') . " " . $match_data['Banka_ucet_MENA'] . ") [" . $r['link'] . "]\r\n";
+        $STRELEC .= "- " . $r['nazev'] . " (" . number_format($castka, 2, ',', ' ') . " " . $match_data['Banka_ucet_MENA'] . ") [" . $r['link'] . "]\r\n";
     }
 
     //vypocet celkove castky
@@ -494,10 +499,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_payment_warn']))
     $to = $rows[0]['Mail'];
     $subject = "Chybějící platba " . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8');
 
-    $message = $email_urgence_hromadna_registrace_platba_text_admin;
+    $message = $email_urgence_hromadna_registrace_platba_text;
     $message = str_replace("##STRELEC##", $STRELEC, $message);
     $message = str_replace("##VAR_SYMBOL##", $varsymbol, $message);
-    $message = str_replace("##CELKOVA_CASTKA##", number_format($celkovaCastka, 2, ',', ' '), $message);
+    $message = str_replace("##CASTKA##", number_format($celkovaCastka, 2, ',', ' '), $message);
     $message = str_replace("##QR_LINK##", $qr_link, $message);
     $message = str_replace("##DatReg##", $datumRegistraceZavodnika->format('d.m.Y'), $message);
     $message = str_replace("##DatPay##", $paymentDeadline, $message);
@@ -514,5 +519,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_payment_warn']))
             "Zpět do administrace"
 
         );
+    } else {
+        $_SESSION['toast'] = [
+            'type' => 'warning',
+            'message' => 'Urgence hromadné platby byla odeslána.',
+            'duration' => 2500
+        ];
+        header("refresh:0;url=index.php");
     }
 }

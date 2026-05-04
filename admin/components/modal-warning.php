@@ -25,7 +25,7 @@ function WarningModal(
                     <div class='fw-bolder text-$WarnColor'>
                         $WarnMessage
                     </div>
-                    <div class='bd-callout-info fw-normal text-center my-3 mx-2'>
+                    <div class='alert alert-info fw-normal text-center my-3 mx-2' role='alert'>
                         $WarnInfo
                     </div>
                 </div>

@@ -18,12 +18,11 @@
                         <tbody>
                             <?php
                             $i = 0;
-                            $query = "SELECT * from $table_fee ORDER BY Count";
-                            $result = mysqli_query($conn, $query);
-                            while ($line = mysqli_fetch_array($result)) {
+                            $result = $conn->query("SELECT Id, Count, Value FROM $table_fee ORDER BY Count");
+                            while ($result && ($line = $result->fetch_assoc())) {
                             ?>
                                 <tr>
-                                    <td ><?= htmlspecialchars($line['Count']) ?></td>
+                                    <td><?= htmlspecialchars($line['Count']) ?></td>
                                     <td class="editable" data-table="<?= $table_fee ?>" data-field="Value" data-id="<?= $line['Id'] ?>"><?= htmlspecialchars($line['Value']) ?></td>
                                     <td class="save-cell" data-id="<?= $line['Id'] ?>">
                                         <button class="btn btn-sm btn-success me-1" disabled><i class="bi bi-check-lg"></i></button>

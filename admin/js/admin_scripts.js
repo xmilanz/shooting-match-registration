@@ -20,28 +20,10 @@ function ToggleFilter() {
     }
 }
 
-// Uploader
-$(function () {
-    $(document).on('click', '.btn-add', function (e) {
-        e.preventDefault();
-        var controlForm = $('.controls:first'),
-            currentEntry = $(this).parents('.entry:first'),
-            newEntry = $(currentEntry.clone()).appendTo(controlForm);
-        newEntry.find('input').val('');
-        controlForm.find('.entry:not(:last) .btn-add')
-            .removeClass('btn-add').addClass('btn-remove')
-            .removeClass('btn-success').addClass('btn-danger')
-            .html('<span class="fa fa-trash"> </span>');
-    }).on('click', '.btn-remove', function (e) {
-        $(this).parents('.entry:first').remove();
-        e.preventDefault();
-        return false;
-    });
-});
-
-// znovuotevření modalu po editaci
-// uživatelé
+// reopen modals
+// users
 $(document).ready(function () {
+    // Check if URL contains the reopen_modal parameter
     if (window.location.search.indexOf("users") > -1) {
         $("#manage_users").modal("show");
     }
@@ -53,19 +35,20 @@ $(document).ready(function () {
     });
 
     function shouldReopenModal() {
-        return false;
+        return false; // This condition can remain as false for now
     }
 });
 $(document).ready(function () {
     if (window.location.search.indexOf("users") > -1) {
-
+        // Remove the parameter from URL
         window.history.replaceState(null, null, window.location.pathname);
     }
 });
 
 
-// disciplíny
+// disciplines
 $(document).ready(function () {
+    // Check if URL contains the reopen_modal parameter
     if (window.location.search.indexOf('disciplines') > -1) {
         $('#manage_disciplines').modal('show');
     }
@@ -77,19 +60,20 @@ $(document).ready(function () {
     });
 
     function shouldReopenModal() {
-        return false;
+        return false; // This condition can remain as false for now
     }
 });
 $(document).ready(function () {
     if (window.location.search.indexOf('disciplines') > -1) {
-
+        // Remove the parameter from URL
         window.history.replaceState(null, null, window.location.pathname);
     }
 });
 
-// startovné
+// fee
 $(document).ready(function () {
-ow.location.search.indexOf('fee') > -1) {
+    // Check if URL contains the reopen_modal parameter
+    if (window.location.search.indexOf('fee') > -1) {
         $('#manage_fee').modal('show');
     }
 
@@ -100,16 +84,19 @@ ow.location.search.indexOf('fee') > -1) {
     });
 
     function shouldReopenModal() {
-        return false;
+        return false; // This condition can remain as false for now
     }
 });
 $(document).ready(function () {
     if (window.location.search.indexOf('fee') > -1) {
+        // Remove the parameter from URL
         window.history.replaceState(null, null, window.location.pathname);
     }
 });
 
-// modal a spinner
+
+
+// open modal with spinner
 $(document).ready(function () {
     $('#myModal').modal('show');
 
@@ -118,7 +105,6 @@ $(document).ready(function () {
         //      $('.modal-footer button').prop('disabled', true); // deaktivace tlačítek
     });
 });
-
 
 // inline editovatelné formulare
 document.querySelectorAll(".editable").forEach((cell) => {
@@ -190,9 +176,24 @@ document.querySelectorAll(".editable").forEach((cell) => {
     });
 });
 
-// aktivace bootstrap popover s HTML
+// aktivace BS-popover s HTML
 document.addEventListener("DOMContentLoaded", function () {
     const popoverTrigger = document.getElementById("userInfoBtn");
     const popover = new bootstrap.Popover(popoverTrigger);
 });
 
+// vyber zavodu v menu - odeslani formulare
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.select-race').forEach(function (item) {
+        item.addEventListener('click', function (e) {
+            e.preventDefault();
+            const raceId = this.dataset.raceId;
+
+            // vložit ID závodu do hidden inputu
+            document.getElementById('raceInput').value = raceId;
+
+            // odeslat POST
+            document.getElementById('raceForm').submit();
+        });
+    });
+});
