@@ -28,8 +28,8 @@ function WarningModalForm(
         </div>
         <div class='modal-body text-center pb-0'>
             <form method='post' action='$WarnActionURL'>
+                <input type='hidden' name='action' value='$WarnAction'>
     ";
-
 
     // Skryté inputy (např. ID a klic)
     foreach ($HiddenFields as $name => $value) {
@@ -39,16 +39,18 @@ function WarningModalForm(
     }
 
     echo "
-        <div class='fw-bolder text-$WarnColor'>
-            $WarnMessage
-        </div>
-            <div class='alert alert-info fw-normal text-center my-3 mx-2' role='alert'>
-                $WarnExtraInfo
-            </div>
+        <div class='fw-bolder text-$WarnColor'>$WarnMessage</div>
+            <div class='alert alert-info fw-normal text-center my-3 mx-2' role='alert'>$WarnExtraInfo</div>
         <div class='modal-footer border-top-0'>
-            <button type='submit'  name='$WarnAction' class='btn btn-$WarnColor'>$SubmitLabel</button>
+            <button type='submit' class='btn btn-$WarnColor'>$SubmitLabel</button>
             <button type='button' class='btn btn-outline-dark' onclick=\"window.location.href = '$WarnCloseHref';\">$CancelLabel</button>
         </div>
             </form>
     ";
 }
+?>
+<script type='text/javascript'>
+	$(document).ready(function() {
+		$('#myModal').modal('show');
+	});
+</script>

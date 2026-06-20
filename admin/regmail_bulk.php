@@ -23,6 +23,6 @@ WarningModalForm(
     "Opravdu chcete poslat závodníkovi<br> " . htmlspecialchars($line['Jmeno']) . " " . htmlspecialchars($line['Prijmeni']) . " registrační mail?",
     "Znovu pošleme registrační e-mail (informace o závodu,<br>QR kód pro zaplacení,...).",
     "./send.php",
-    "bulk_regmail",
+    "regmail_bulk",
     "Odeslat registrační mail"
 );

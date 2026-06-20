@@ -3,7 +3,7 @@ $konec_registrace_text = ($match_data['Zavod_konec_registrace'] == 0) ? 'o půln
 
 $volitelnaPlatba = "";
 
-if ($match_data['Zavod_platba_volitelna'] === 'on') {
+if ($match_data['Zavod_platba_volitelna'] == 1) {
     $volitelnaPlatba = <<<HTML
 
 Pro případ, že se rozhodnete startovné zaplatit předem, posíláme platební údaje:
@@ -384,7 +384,7 @@ správce registračního systému vytvořil uživatelský účet pro přístup d
 
 ##UZIVATEL##
 
-<strong><span style=\"color:#ff0000;\">Důrazně doporučujeme změnit heslo hned při prvním přihlášení!!!</strong></span> <i>Tlačítko pro změnu hesla je v uživatelské oblasti - poslední položka menu v administrace (ikonka 'uživatel' Jméno Příjmení).</i>
+<strong><span style=\"color:#ff0000;\">Pro první přihlášení je vynucená zmena hesla.</span></strong> 
 
 S pozdravem
 <strong>".$match_data['Zavod_poradatel']."</strong>

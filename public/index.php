@@ -9,10 +9,8 @@ $download = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill
 if ($match_data['Zavod_registrace_pozastaveno']) {
     $match_data = array_merge($match_data, [
         'Squad_main_max' => '',
-        'Squad_prem_max' => '',
         'zavod_categories' => '-',
         'Zavod_datum' => '-',
-        'Zavod_min_pocet_ran' => '-'
     ]);
 }
 
@@ -45,11 +43,14 @@ $FeeStmt->close();
                 <dt class="col-4 text-end text-start pe-0 <?= hidden(!$isRegistracePozastavena) ?>">Stav:</dt>
                 <dd class="col-8 ps-2 text-danger <?= hidden(!$isRegistracePozastavena) ?>">Pozastavená registrace</dd>
                 <dt class="col-4 text-end text-start pe-0">Pořadatel:</dt>
-                <dd class="col-8 ps-2"><?= !empty($match_data['Zavod_poradatel']) ? htmlspecialchars($match_data['Zavod_poradatel'], ENT_QUOTES, 'UTF-8') : '<mark class="text-danger small">nenastaveno v administraci</mark>' ?></dd>
-                <dt class="col-4 text-end text-start pe-0">Datum:</dt>
+                <dd class="col-8 ps-2"><?= !empty($match_data['Zavod_poradatel']) ? htmlspecialchars($match_data['Zavod_poradatel'], ENT_QUOTES, 'UTF-8') : '<mark class="text-danger small">nenastaveno v administraci</mark>' ?></dd>                <dt class="col-4 text-end text-start pe-0">Datum:</dt>
                 <dd class="col-8 ps-2"><?= htmlspecialchars($match_data['Zavod_datum'], ENT_QUOTES, 'UTF-8'); ?></dd>
                 <dt class="col-4 text-end text-start pe-0">Místo:</dt>
-                <dd class="col-8 ps-2"><?= !empty($match_data['Zavod_misto']) ? htmlspecialchars($match_data['Zavod_misto'], ENT_QUOTES, 'UTF-8') : ''; ?>&nbsp;&nbsp;<a href='<? !empty($match_data['Zavod_misto_mapa']) ? htmlspecialchars($match_data['Zavod_misto_mapa'], ENT_QUOTES, 'UTF-8') : ''; ?>' target='_blank' rel='noopener'><i class='fas fa-crosshairs text-dark'></i></a></dd>
+                <dd class="col-8 ps-2"><?= !empty($match_data['Zavod_misto']) ? htmlspecialchars($match_data['Zavod_misto'], ENT_QUOTES, 'UTF-8') : ''; ?>&nbsp;&nbsp;
+                    <a href="<?= !empty($match_data['Zavod_misto_mapa']) ? htmlspecialchars($match_data['Zavod_misto_mapa'], ENT_QUOTES, 'UTF-8') : ''; ?>" target="_blank" rel="noopener">
+                        <i class='fas fa-crosshairs text-dark'></i>
+                    </a>
+                </dd>
                 <dt class="col-4 text-end text-start pe-0">Placení:</dt>
                 <dd class="col-8 ps-2"><?= ($match_data['Payment_before']) ? 'do ' . $match_data['Zavod_pocet_dni_na_platbu'] . ' dnů od registrace' : 'na místě' ?></dd>
                 <dt class="col-4 text-end text-start pe-0">Startovné:</dt>
@@ -72,14 +73,14 @@ $FeeStmt->close();
                         echo "</small>";
                     }
                     ?>
-                    <br><span class="small text-danger">+50 Kč při registraci na místě</span>
+                    <br><span class="small text-danger">+100 Kč při registraci na místě</span>
                 </dd>
                 <dt class="col-12 text-center py-3">
                     <form method="get" action="<?= !empty($match_data['Zavod_propozice']) ? htmlspecialchars($match_data['Zavod_propozice'], ENT_QUOTES, 'UTF-8') : '' ?>">
-						<?= empty($match_data['Zavod_propozice']) ? '<mark class="text-danger small">nenastaveno v administraci</mark>' : '' ?>
-						<button class="btn btn-outline-dark btn-sm" type="submit"><?= $download; ?>&nbsp;&nbsp;STÁHNOUT PROPOZICE
-						</button>
-					</form>
+                        <?= empty($match_data['Zavod_propozice']) ? '<mark class="text-danger small">nenastaveno v administraci</mark>' : '' ?>
+                        <button class="btn btn-outline-dark btn-sm" type="submit"><?= $download; ?>&nbsp;&nbsp;STÁHNOUT PROPOZICE
+                        </button>
+                    </form>
                 </dt>
             </dl>
         </div>
@@ -184,7 +185,7 @@ $FeeStmt->close();
                 <h3>Časový plán</h3>
             </div>
             <table class="<?= hidden($isRegistracePozastavena) ?> table table-borderless m-2">
-                <tr class="<?= (empty($match_data['Squad_prem_max'])) ? "d-none" : ""; ?>">
+                <tr class="<?= hidden($match_data['Squad_prem_max'] == 0); ?>">
                     <td><strong>Prematch</strong></td>
                     <td><?= "$denPrematch " . $datumPrematch->format('j.n.Y') . "" ?></td>
                     <td><?= htmlspecialchars($match_data['Zavod_cas_prematch'], ENT_QUOTES, 'UTF-8') ?></td>
@@ -262,7 +263,7 @@ while ($row = $result->fetch_assoc()) {
     </div>
 </div>
 
-<div class="row my-3 <?= $paymentBeforeClass ?>">
+<div class="row my-3 <?= hidden($match_data['Payment_before'] == 0); ?>">
     <div class="col-md-6">
         <div class="article">
             <div class="caption mb-2 p-2">

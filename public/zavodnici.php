@@ -130,7 +130,7 @@ $stmt->close();
                 ?>
             </tbody>
         </table>
-        <div class="my-3 <?= $paymentBeforeClass ?>">
+        <div class="my-3 <?= hidden($match_data['Payment_before'] == 0); ?>">
             <h3>Přehled placení</h3>
             <ul>
                 <li>zaplaceno: <?= $zavodniciZaplaceno ?></li>

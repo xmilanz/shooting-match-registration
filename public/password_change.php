@@ -2,11 +2,10 @@
 
 require_once __DIR__ . '/session_init.php';
 require_admin();
-
 ?>
 
 <div class='text-center'>
-    <img src='./images/bkg_ssapt.png'>
+    <img src='./images/bkg_<?= $poradatel ?>.png'>
 </div>
 
 <div class="modal fade" id="password_change" tabindex="-1" role="dialog" data-bs-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -20,8 +19,9 @@ require_admin();
             </div>
             <div class="modal-body mx-2">
                 <form class="row" method="post" action="./save.php" novalidate>
-                    <input type="hidden" name="forced_password_change" value="1">
-                    <input type="hidden" name="name" value="<?php echo $_SESSION['name'] ?? ''; ?>">
+                    <input type="hidden" name="action" value="change_password">
+                    <input type="hidden" name="token" value="<?= $_SESSION['token'] ?>">
+                    <input type="hidden" name="name" value="<?= $_SESSION['name'] ?? ''; ?>">
 
                     <div class="form-outline">
                         <label class="form-label" for="password_new">Nové heslo</label>

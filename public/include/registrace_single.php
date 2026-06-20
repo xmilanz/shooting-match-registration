@@ -1,7 +1,3 @@
-<!-- ============================================================
-    SINGLE REGISTRCE
-============================================================ -->
-
 <?php
 // Načtení disciplín
 $nazvy_disciplin = $zkratky_disciplin = $popisy_disciplin = [];
@@ -13,21 +9,26 @@ while ($row = $result->fetch_assoc()) {
     $popisy_disciplin[$id] = $row['Description'];
 }
 
+// Načteme počty všech disciplin
+$counts = [];
+$sqlCounts = "SELECT Disciplina, COUNT(*) AS count FROM " . $table . " GROUP BY Disciplina";
+$resCounts = $conn->query($sqlCounts);
+while ($r = $resCounts->fetch_assoc()) {
+    $counts[$r['Disciplina']] = (int)$r['count'];
+}
+$resCounts->free();
+
+// Získáme kapacitu disciplín z nastavení závodu
+$discMax = (int)($match_data['Squad_main_max'] ?? 0);
+
 // Výpis disciplin
 foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
     $zkratka = htmlspecialchars($zkratky_disciplin[$id] ?? '', ENT_QUOTES, 'UTF-8');
-    $popis = htmlspecialchars($popisy_disciplin[$id] ?? '', ENT_QUOTES, 'UTF-8');
-
-    // Počet závodníků
-    $stmt = $conn->prepare("SELECT COUNT(*) FROM " . $table . " WHERE Disciplina = ?");
-    $stmt->bind_param("s", $zkratka);
-    $stmt->execute();
-    $stmt->bind_result($pocet);
-    $stmt->fetch();
-    $stmt->close();
+    $popis = "- " . htmlspecialchars($popisy_disciplin[$id] ?? '', ENT_QUOTES, 'UTF-8') . "";
+    $pocet = $counts[$zkratka] ?? 0;
 
     echo "<div class='row my-3 mx-1 ms-2 border border-primary bg-white clearfix'>";
-    echo "<div class='caption col h5 py-2 px-2'><span>$nazev_discipliny <small>- $popis</small></span>";
+    echo "<div class='caption col h5 py-2 px-2'><span>$nazev_discipliny <small>$popis</small></span>";
 
     // Stav registrace, tlacitko (single registrace)
     $disabledMatchBtn = "<button class='btn btn-outline-dark float-end' disabled>Pozastaveno</button>";
@@ -36,7 +37,7 @@ foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
 
     if ($match_data['Zavod_registrace_pozastaveno'] == 1) {
         echo $disabledMatchBtn;
-    } else if ($reg_started && $dnes < $datumKonecRegistrace) {
+    } else if ($regAktivni) {
         echo ($pocet < $match_data['Squad_main_max']) ? $enabledBtn : $disabledBtn;
     }
 
@@ -61,17 +62,21 @@ foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
         }
 
         // definice ikon
-        $serieIcon = "";
-        $roIcon = $pomIcon = $vipIcon = "";
-        if ($line['Staff'] === "RO") {
-            $roIcon = "<i class='far fa-clock' style='font-size:12px'></i>";
-        } elseif ($line['Staff'] === "POM") {
-            $pomIcon = "<i class='far fa-handshake' style='font-size:12px'></i>";
-        } elseif ($line['Staff'] === "VIP") {
-            $vipIcon = "<i class='far fa-crown' style='font-size:12px'></i>";
-        }
+        $serieIcon = ""; //doprogramovat podle potřeby, zatím ponecháno prázdné, protože se nevyužívá
+        $staffIcon = "";
+        if ($line['Staff'] == "RO") {
+            $staffIcon = "<i class='far fa-clock' style='font-size:12px'></i>";
+        };
+        $pomIcon = "";
+        if ($line['Staff'] == "POM") {
+            $staffIcon = "<i class='far fa-handshake' style='font-size:12px'></i>";
+        };
+        $vipIcon = "";
+        if ($line['Staff'] == "VIP") {
+            $staffIcon = "<i class='far fa-crown' style='font-size:12px'></i>";
+        };
 
-        echo "<span class='fw-bold text-nowrap'>" . $serieIcon . $roIcon . $pomIcon . $vipIcon . "&nbsp;" . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "</span>, ";
+        echo "<span class='fw-bold text-nowrap'>" . $serieIcon . $staffIcon . "&nbsp;" . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "</span>, ";
     }
     $stmt->close();
     echo "</div>";
@@ -81,6 +86,7 @@ foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
     echo "<form class='row my-3 needs-validation' method='post' action='./save.php' novalidate>";
     echo "<input type='hidden' name='token' value='" . htmlspecialchars($_SESSION['token'] ?? '', ENT_QUOTES, 'UTF-8') . "'>";
     echo "<input type='hidden' name='gender'>";
+    echo "<input type='hidden' name='action' value='register_single'>";
     echo "<input type='hidden' name='Disciplina' value='" . htmlspecialchars($zkratka, ENT_QUOTES, 'UTF-8') . "'>";
     echo "<input type='hidden' name='datreg' value=" . $dnes->getTimestamp() . ">";
 
@@ -89,7 +95,7 @@ foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
 
     $tyden = (clone $datumZavod)->format('W');
     $varsymbol = "$tyden" . ($line[0] + 1);
-    ?>
+?>
     <div class="row">
         <div class="col-md-3">
             <label for="Jmeno" class="form-label mt-3">Jméno</label>
@@ -124,17 +130,31 @@ foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
     <div class="row mt-3">
         <div class="col-md-3 <?= hidden($match_data['Zavod_obcansky_prukaz'] == 0); ?>">
             <label for="ObcanskyPrukaz" class="form-label mt-3">Číslo OP / EZP
-                <a href="#" role="button" tabindex="0" id="userInfoBtn" data-bs-toggle="popover" data-bs-placement="top"
-                    data-bs-html="true" data-bs-title="Občanský průkaz a Evrovský zbrojní pas"
-                    data-bs-content="Nemá-li závodník dosud vydaný občanský průkaz<br>(nejčastěji kategorie Junior), napište <strong>0000000000</strong>.<br><br>U cizích státních příslušníků vyplňte číslo identifikačního <br>průkazu i v případě, že obsahuje mezery nebo písmena.">
+                <a
+                    role="button"
+                    tabindex="0"
+                    id="userInfoBtn"
+                    data-bs-toggle="popover"
+                    data-bs-placement="top"
+                    data-bs-html="true"
+                    data-bs-title="Občanský průkaz a Evrovský zbrojní pas"
+                    data-bs-content="
+                        Nemá-li závodník dosud vydaný občanský průkaz<br>(nejčastěji kategorie Junior), napište <strong>0000000000</strong>.<br><br>U cizích státních příslušníků vyplňte číslo identifikačního <br>průkazu i v případě, že obsahuje mezery nebo písmena.
+                        ">
                     <sup><i class="fas fa-question-circle text-primary ms-1" style="font-size: 12px;"></i></sup>
                 </a>
             </label>
-            <input class="form-control" type="text" name="ObcanskyPrukaz" id="ObcanskyPrukaz<?= $zkratka ?>"
+            <input
+                class="form-control"
+                type="text"
+                name="ObcanskyPrukaz"
+                id="ObcanskyPrukaz<?= $zkratka ?>"
                 placeholder="0123456789 / 0000000000" onfocus="this.placeholder = ''"
-                onblur="this.placeholder = '0123456789 / 0000000000'" <?= required($match_data['Zavod_obcansky_prukaz'] == 1); ?>>
+                onblur="this.placeholder = '0123456789 / 0000000000'"
+                <?= required($match_data['Zavod_obcansky_prukaz'] == 1); ?>>
             <div class="invalid-feedback">Nevyplnili jste číslo OP / EZP<br>(u juniora bez OP napište 0000000000)</div>
         </div>
+        
         <div class="col-md-3 mt-5 <?= hidden($match_data['Zavod_obcansky_prukaz'] == 0); ?>">
             <label class="form-check-label" for="ZbrojniOpravneni<?= $zkratka ?>">
                 <input class="me-1" type="checkbox" class="form-check-input" id="ZbrojniOpravneni<?= $zkratka ?>"
@@ -180,45 +200,48 @@ foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
             onfocus="this.placeholder = ''" onblur="this.placeholder = 'Poznámka'" rows="3"></textarea>
     </div>
 
-    <div class="col-12 my-4 text-start">
-        Provedením registrace vyjadřuji souhlas s
-        <a data-bs-toggle="collapse" href="#collapseRules" role="button" aria-expanded="false"
-            aria-controls="collapseRules">pravidly registrace</a> a&nbsp;zpracováním osobních údajů.
-        <div class="collapse" id="collapseRules">
-            <div class="card card-body mt-2 mb-3 me-4">
-                <ul>
-                    <li>Registrace se uzavírá
-                        <?= ($match_data['Zavod_konec_registrace'] == 0) ? 'o půlnoci před registrací' : "$match_data[Zavod_konec_registrace] den/dny před konáním závodu" ?>.
-                    </li>
-                    <li>Pořadatelé si vyhrazují právo zařadit závodníků do jednotlivých směn za účelem zajištění hladkého
-                        průběhu závodu.</li>
-                    <li>Nezadá-li závodník při registraci platný email, vystavuje se riziku, že nebude informován o
-                        případných změnách závodu.</li>
-                    <li class="<?= $paymentBeforeClass ?> ">Startovné se hradí tak, aby platba proběhla do
-                        <?php echo $match_data['Zavod_pocet_dni_na_platbu']; ?> dnů od registrace.<br>- u závodníků
-                        zaregistrovaných méně jak <?php echo $match_data['Zavod_pocet_dni_na_platbu']; ?> dní před závodem
-                        je třeba startovné zaplatit nejpozději dva dny před závodem
-                    </li>
-                    <li class="<?= $paymentBeforeClass ?>">Startovné je nevratné, lze jej přenést na jiného závodníka.</li>
-                    <li class="<?= $paymentBeforeClass ?>">V případě neuhrazení startovného v řádném termínu je registrace
-                        zrušena.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="alert alert-danger m-lg-2 <?= $zavodCisloZbraneClass ?>" role="alert">
-            Pro ověření čísla zbraně při prezenci je nutné, abyste měli výpis zbrojního listu <small>(vytisknutý nebo online z Portálu občana).</small>
+    <div class="row px-4 mt-3">
+        <div class="alert alert-danger m-lg-2 <?= hidden($match_data['Zavod_cislo_zbrane'] == 0); ?>" role="alert">
+            Při prezenci se eviduje také VÝROBNÍ ČÍSLO ZBRANĚ. Můžete ho vyplnit zde ve formuláři nebo si jej přineste s sebou <small>(napsané na papíru, vytisknutý výpis ze zbrojního listu nebo online v Portálu občana).</small>
         </div>
         <div class="alert alert-info m-lg-2" role="alert">
             Pokud sdílíte zbraň s jiným závodníkem, napište do poznámky jeho jméno a příjmení.
         </div>
     </div>
 
-    <div class="col-12 text-center mt-3">
-        <button type="submit" name="registrovat" class="btn btn-primary mb-2">Registrovat</button>
+    <div class="row px-4 mt-3">
+        <div class="col-12 text-center">
+            Provedením registrace vyjadřuji souhlas s
+            <a data-bs-toggle="collapse" href="#collapseRules" role="button" aria-expanded="false"
+                aria-controls="collapseRules">pravidly registrace</a> a&nbsp;zpracováním osobních údajů.
+            <div class="collapse text-start" id="collapseRules">
+                <div class="card card-body mt-2 mb-3 me-4">
+                    <ul>
+                        <li>Registrace se uzavírá
+                            <?= ($match_data['Zavod_konec_registrace'] == 0) ? 'o půlnoci před registrací' : "$match_data[Zavod_konec_registrace] den/dny před konáním závodu" ?>.
+                        </li>
+                        <li>Pořadatelé si vyhrazují právo zařadit závodníků do jednotlivých směn za účelem zajištění hladkého
+                            průběhu závodu.</li>
+                        <li>Nezadá-li závodník při registraci platný email, vystavuje se riziku, že nebude informován o
+                            případných změnách závodu.</li>
+                        <li class="<?= hidden($match_data['Payment_before'] == 0); ?> ">Startovné se hradí tak, aby platba proběhla do
+                            <?php echo $match_data['Zavod_pocet_dni_na_platbu']; ?> dnů od registrace.<br>- u závodníků
+                            zaregistrovaných méně jak <?php echo $match_data['Zavod_pocet_dni_na_platbu']; ?> dní před závodem
+                            je třeba startovné zaplatit nejpozději dva dny před závodem
+                        </li>
+                        <li class="<?= hidden($match_data['Payment_before'] == 0); ?>">Startovné je nevratné, lze jej přenést na jiného závodníka.</li>
+                        <li class="<?= hidden($match_data['Payment_before'] == 0); ?>">V případě neuhrazení startovného v řádném termínu je registrace
+                            zrušena.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
-    <?php
+    <div class="col-12 text-center mt-3">
+        <button type="submit" class="btn btn-primary mb-2">Registrovat</button>
+    </div>
+<?php
     echo "</form></div></div></div>";
 }
+
 ?>

@@ -40,32 +40,41 @@
                             while ($result && ($line = $result->fetch_assoc())) {
                             ?>
                                 <tr>
-                                    <td class="editable" data-table="<?= $table_disciplines ?>" data-field="Name"
-                                        data-id="<?= $line['Id'] ?>"><?= htmlspecialchars($line['Name']) ?></td>
-                                    <td style="white-space:nowrap;" class="editable" data-table="<?= $table_disciplines ?>"
-                                        data-field="Value" data-id="<?= $line['Id'] ?>">
-                                        <?= htmlspecialchars($line['Value']) ?>
+                                    <td class="editable"
+                                        data-table="<?= $table_disciplines ?>"
+                                        data-field="Name"
+                                        data-id="<?= $line['Id'] ?>"><?= htmlspecialchars($line['Name']) ?>
                                     </td>
-                                    <td class="editable" data-table="<?= $table_disciplines ?>" data-field="Description"
-                                        data-id="<?= $line['Id'] ?>"><?= htmlspecialchars($line['Description']) ?></td>
-                                    <td class="<?= $smenyRegistraceClass ?> editable text-center" data-table="<?= $table_disciplines ?>"
-                                        data-field="Shift_from" data-id="<?= $line['Id'] ?>">
-                                        <?= htmlspecialchars($line['Shift_from']) ?>
+                                    <td style="white-space:nowrap;"
+                                        class="editable"
+                                        data-table="<?= $table_disciplines ?>"
+                                        data-field="Value"
+                                        data-id="<?= $line['Id'] ?>"><?= htmlspecialchars($line['Value']) ?>
                                     </td>
-                                    <td class="<?= $smenyRegistraceClass ?> editable text-center" data-table="<?= $table_disciplines ?>"
-                                        data-field="Shift_to" data-id="<?= $line['Id'] ?>">
-                                        <?= htmlspecialchars($line['Shift_to']) ?>
+                                    <td class="editable"
+                                        data-table="<?= $table_disciplines ?>"
+                                        data-field="Description"
+                                        data-id="<?= $line['Id'] ?>"><?= htmlspecialchars($line['Description']) ?>
+                                    </td>
+                                    <td class="<?= $smenyRegistraceClass ?> editable text-center"
+                                        data-table="<?= $table_disciplines ?>"
+                                        data-field="Shift_from"
+                                        data-id="<?= $line['Id'] ?>"><?= htmlspecialchars($line['Shift_from']) ?>
+                                    </td>
+                                    <td class="<?= $smenyRegistraceClass ?> editable text-center"
+                                        data-table="<?= $table_disciplines ?>"
+                                        data-field="Shift_to"
+                                        data-id="<?= $line['Id'] ?>"><?= htmlspecialchars($line['Shift_to']) ?>
                                     </td>
                                     <td class="save-cell" data-id="<?= $line['Id'] ?>">
-                                        <button class="btn btn-sm btn-success me-1" disabled><i
-                                                class="bi bi-check-lg"></i></button>
-                                        <button class="btn btn-sm btn-secondary" disabled><i
-                                                class="bi bi-x-lg"></i></button>
-                                        <form action="./save.php" method="POST" class="d-inline"> <input type="hidden"
-                                                name="delete_discipline" value="1"> <input type="hidden" name="name"
-                                                value="<?= $line['Name'] ?>"> <button type="submit"
-                                                class="btn btn-sm btn-danger ms-2"> <i class="bi bi-trash3 mx-2"></i>
-                                            </button> </form>
+                                        <button class="btn btn-sm btn-success me-1" disabled><i class="bi bi-check-lg"></i></button>
+                                        <button class="btn btn-sm btn-secondary" disabled><i class="bi bi-x-lg"></i></button>
+                                        <form action="./save.php" method="POST" class="d-inline">
+                                            <input type='hidden' name='action' value='discipline_delete'>
+                                            <input type="hidden" name="name" value="<?= $line['Name'] ?>">
+                                            <button type="submit" class="btn btn-sm btn-danger ms-2"> <i class="bi bi-trash3 mx-2"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php
@@ -73,13 +82,14 @@
                             }
                             ?>
                             <form class="needs-validation" method="post" action="./save.php" validate>
+                                <input type='hidden' name='action' value='discipline_new'>
                                 <tr>
                                     <td><input class="form-control" type="text" name="Name" id="Name" onkeypress="return avoidspace(event)" required></td>
                                     <td><input class="form-control" type="text" name="Value" id="Value" required></td>
                                     <td><input class="form-control" type="text" name="Description" id="Description"></td>
                                     <td class="<?= $smenyRegistraceClass ?>"><input class="form-control" type="text" name="Shift_from" id="Shift_from"></td>
                                     <td class="<?= $smenyRegistraceClass ?>"><input class="form-control" type="text" name="Shift_to" id="Shift_to"></td>
-                                    <td class="text-center"><button type="submit" name="new_discipline" class="btn btn-sm btn-primary px-4 py-2"><i class="bi bi-plus-circle me-1"></i>Přidat</button></td>
+                                    <td class="text-center"><button type="submit" class="btn btn-sm btn-primary px-4 py-2"><i class="bi bi-plus-circle me-1"></i>Přidat</button></td>
                                 </tr>
                             </form>
                         </tbody>

@@ -22,6 +22,6 @@ WarningModalForm(
     "Opravdu chcete vyřadit závodníka " . htmlspecialchars($line['Jmeno']) . " " . htmlspecialchars($line['Prijmeni']) . " (" . $nazev_discipliny . ")?",
     "Závodník nebude odstraněn, ale změní se statut na VYŘAZENO.",
     "./save.php",
-    "cancel_shooter",
+    "shooter_cancel",
     "Vyřadit závodníka",
 );

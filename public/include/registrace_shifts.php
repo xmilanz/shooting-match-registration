@@ -1,7 +1,3 @@
-<!-- ============================================================
-    REGISTRCE DO SMĚN A STAVŮ
-============================================================ -->
-
 <?php
 $stmt = $conn->prepare("
     SELECT Prijmeni,Jmeno,Stav,Disciplina FROM $table
@@ -50,6 +46,7 @@ while ($d = $disciplinesResult->fetch_assoc()) {
         <form id="singleRegForm" class="modal-content needs-validation" method="post" action="./save.php" novalidate>
             <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
             <input type="hidden" name="gender">
+            <input type="hidden" name="action" value="register_shifts">
             <input type="hidden" name="datreg" value="<?php echo $dnes->getTimestamp(); ?>">
             <input type="hidden" name="Stav" id="modalStav" value="">
             <div class="modal-header bg-primary text-center">
@@ -195,7 +192,7 @@ while ($d = $disciplinesResult->fetch_assoc()) {
                                         zajištění hladkého průběhu závodu.</li>
                                     <li>Nezadá-li závodník při registraci platný e-mail, vystavuje se riziku, že nebude
                                         informován o případných změnách závodu.</li>
-                                    <li class="<?= $paymentBeforeClass ?>">Startovné se hradí tak, aby platba proběhla
+                                    <li class="<?= hidden($match_data['Payment_before'] == 0); ?>">Startovné se hradí tak, aby platba proběhla
                                         do
                                         <?php echo $match_data['Zavod_pocet_dni_na_platbu']; ?> dnů od
                                         registrace.<br>
@@ -203,9 +200,9 @@ while ($d = $disciplinesResult->fetch_assoc()) {
                                         <?php echo $match_data['Zavod_pocet_dni_na_platbu']; ?> dní před závodem je
                                         třeba startovné zaplatit nejpozději dva dny před závodem
                                     </li>
-                                    <li class="<?= $paymentBeforeClass ?>">Startovné je nevratné, lze jej přenést na
+                                    <li class="<?= hidden($match_data['Payment_before'] == 0); ?>">Startovné je nevratné, lze jej přenést na
                                         jiného závodníka.</li>
-                                    <li class="<?= $paymentBeforeClass ?>">V případě neuhrazení startovného v řádném
+                                    <li class="<?= hidden($match_data['Payment_before'] == 0); ?>">V případě neuhrazení startovného v řádném
                                         termínu je registrace zrušena.</li>
                                 </ul>
                             </div>

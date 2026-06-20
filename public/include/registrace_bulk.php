@@ -1,17 +1,11 @@
-<!-- ============================================================
-    BULK REGISTRCE
-============================================================ -->
-
 <?php
 $disabledBtn = "<button class='btn btn-lg btn-primary mb-3 ms-2 'disabled>Registrace jedné nebo více disciplín</button>";
 $enabledBtn = "<button class='btn btn-lg btn-primary mb-3 ms-2 ' data-bs-toggle='modal' data-bs-target='#bulkRegModal'>Registrace do jedné nebo více disciplín</button>";
 
 if ($match_data['Zavod_registrace_pozastaveno'] == 1) {
     echo $disabledBtn;
-} else if ($reg_started && $dnes < $datumKonecRegistrace) {
+} elseif ($regAktivni) {
     echo $enabledBtn;
-} else {
-    echo "";
 }
 ?>
 <div class="modal fade" id="bulkRegModal" tabindex="-1">
@@ -19,6 +13,7 @@ if ($match_data['Zavod_registrace_pozastaveno'] == 1) {
         <form id="bulkRegForm" class="modal-content needs-validation" method="post" action="./save.php" novalidate>
             <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
             <input type="hidden" name="gender">
+            <input type='hidden' name='action' value='register_bulk'>
             <input type="hidden" name="datreg" value="<?php echo $dnes->getTimestamp(); ?>">
             <div class="modal-header bg-primary text-center">
                 <h4 class="modal-title text-white w-100 fw-bold py-2">Registrace do jedné nebo více disciplín</h4>
@@ -150,51 +145,49 @@ if ($match_data['Zavod_registrace_pozastaveno'] == 1) {
                 <button type="button" id="addDisc" class="btn btn-sm btn-success mt-1 ms-2">
                     + Další disciplína
                 </button>
-                <div class="row my-3">
-                    <div class="col-12 text-start">
+
+
+                <div class="row pe-4 mt-3">
+                    <div class="alert alert-danger m-lg-2 <?= hidden($match_data['Zavod_cislo_zbrane'] == 0); ?>" role="alert">
+                        Při prezenci se eviduje také VÝROBNÍ ČÍSLO ZBRANĚ. Můžete ho vyplnit zde ve formuláři nebo si jej přineste s sebou <small>(napsané na papíru, vytisknutý výpis ze zbrojního listu nebo online v Portálu občana).</small>
+                    </div>
+                    <div class="alert alert-info m-lg-2" role="alert">
+                        Pokud sdílíte zbraň s jiným závodníkem, napište do poznámky jeho jméno a příjmení.
+                    </div>
+                </div>
+
+                <div class="row pe-4 mt-3">
+                    <div class="col-12 text-center">
                         Provedením registrace vyjadřuji souhlas s
                         <a data-bs-toggle="collapse" href="#collapseRules" role="button" aria-expanded="false"
                             aria-controls="collapseRules">pravidly registrace</a> a&nbsp;zpracováním osobních údajů.
-                        <div class="collapse" id="collapseRules">
+                        <div class="collapse text-start" id="collapseRules">
                             <div class="card card-body mt-2 mb-3 me-4">
                                 <ul>
                                     <li>Registrace se uzavírá
                                         <?= ($match_data['Zavod_konec_registrace'] == 0) ? 'o půlnoci před registrací' : "$match_data[Zavod_konec_registrace] den/dny před konáním závodu" ?>.
                                     </li>
-                                    <li>Pořadatelé si vyhrazují právo zařadit závodníků do jednotlivých směn za
-                                        účelem zajištění hladkého průběhu závodu.</li>
-                                    <li>Nezadá-li závodník při registraci platný e-mail, vystavuje se riziku, že
-                                        nebude informován o případných změnách závodu.</li>
-                                    <li class="<?= $paymentBeforeClass ?> ">Startovné se hradí tak, aby platba
-                                        proběhla do <?php echo $match_data['Zavod_pocet_dni_na_platbu']; ?> dnů od
-                                        registrace.<br>- u závodníků zaregistrovaných méně jak
-                                        <?php echo $match_data['Zavod_pocet_dni_na_platbu']; ?> dní před závodem je
-                                        třeba startovné zaplatit nejpozději dva dny před závodem
+                                    <li>Pořadatelé si vyhrazují právo zařadit závodníků do jednotlivých směn za účelem zajištění hladkého
+                                        průběhu závodu.</li>
+                                    <li>Nezadá-li závodník při registraci platný email, vystavuje se riziku, že nebude informován o
+                                        případných změnách závodu.</li>
+                                    <li class="<?= hidden($match_data['Payment_before'] == 0); ?> ">Startovné se hradí tak, aby platba proběhla do
+                                        <?php echo $match_data['Zavod_pocet_dni_na_platbu']; ?> dnů od registrace.<br>- u závodníků
+                                        zaregistrovaných méně jak <?php echo $match_data['Zavod_pocet_dni_na_platbu']; ?> dní před závodem
+                                        je třeba startovné zaplatit nejpozději dva dny před závodem
                                     </li>
-                                    <li class="<?= $paymentBeforeClass ?>">Startovné je nevratné, lze jej přenést na
-                                        jiného závodníka.</li>
-                                    <li class="<?= $paymentBeforeClass ?>">V případě neuhrazení startovného v řádném
-                                        termínu je registrace zrušena.</li>
+                                    <li class="<?= hidden($match_data['Payment_before'] == 0); ?>">Startovné je nevratné, lze jej přenést na jiného závodníka.</li>
+                                    <li class="<?= hidden($match_data['Payment_before'] == 0); ?>">V případě neuhrazení startovného v řádném termínu je registrace
+                                        zrušena.</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-12 text-center">
-                        <div class="alert alert-danger <?= $zavodCisloZbraneClass ?>" role="alert">
-                            Pro ověření čísla zbraně při prezenci je nutné, abyste měli výpis zbrojního listu
-                            <small>(vytisknutý nebo online z Portálu občana).</small>
-                        </div>
-                        <div class="alert alert-info" role="alert">
-                            Při registraci více disciplín je vybírejte podle toho, jak je budete chtít střílet.<br>
-                            Pokud sdílíte zbraň s jiným závodníkem, napište do poznámky jeho jméno a příjmení.
-                        </div>
-                    </div>
-                </div>
+
             </div>
             <div class="modal-footer">
-                <button type="submit" name="bulk_registrovat" class="btn btn-primary">Registrovat</button>
+                <button type="submit" class="btn btn-primary">Registrovat</button>
                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close"
                     onclick="window.location.href = 'registrace.php';">Zavřít</button>
             </div>
@@ -214,18 +207,19 @@ while ($row = $result->fetch_assoc()) {
     $popisy_disciplin[$id] = $row['Description'];
 }
 
+// Počet závodníků
+$stmt = $conn->prepare("SELECT COUNT(*) FROM " . $table . " WHERE Disciplina = ?");
+$stmt->bind_param("s", $zkratka);
+$stmt->execute();
+$stmt->bind_result($pocet);
+$stmt->fetch();
+$stmt->close();
+
 // Výpis disciplin
 foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
     $zkratka = htmlspecialchars($zkratky_disciplin[$id] ?? '', ENT_QUOTES, 'UTF-8');
     $popis = htmlspecialchars($popisy_disciplin[$id] ?? '', ENT_QUOTES, 'UTF-8');
 
-    // Počet závodníků
-    $stmt = $conn->prepare("SELECT COUNT(*) FROM " . $table . " WHERE Disciplina = ?");
-    $stmt->bind_param("s", $zkratka);
-    $stmt->execute();
-    $stmt->bind_result($pocet);
-    $stmt->fetch();
-    $stmt->close();
 
     echo "<div class='row my-3 mx-1 ms-2 border border-primary bg-white clearfix'>";
     echo "<div class='caption col h5 py-2 px-2'><span>$nazev_discipliny <small>- $popis</small></span>";

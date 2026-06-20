@@ -6,6 +6,7 @@ $table = "";
 $table_matches = "";
 
 $table_setting = $table . "_setting";
+$table_admins = "";
 
 $reg_url = "https://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']); // pro zobrazení v emailu (link na odhlášení ze závodu) musí být absolutní URL
 

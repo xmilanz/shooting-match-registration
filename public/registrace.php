@@ -20,16 +20,12 @@ $datumKonecRegistrace = (clone $datumZavod)
 $reg_started = false;
 $reg_text = "";
 
-if ($match_data['Zavod_registrace_pozastaveno']) {
+if ($match_data['Zavod_registrace_pozastaveno'] == 1) {
     $reg_text = "<span class='text-danger'>Registrace je pozastavená</span>";
 } else if ($dnes > $datumKonecRegistrace) {
     $reg_text = "Registrace skončila " . $datumKonecRegistrace->format('j.n.Y H:i') . " ";
-    $match_data['Squad_main_max'] = 0;
-    $match_data['Squad_prem_max'] = 0;
 } else if ($dnes < $datumZacatekRegistrace) {
     $reg_text = "Registrace bude spuštěna " . $datumZacatekRegistrace->format('j.n.Y H:i') . " ";
-    $match_data['Squad_main_max'] = 0;
-    $match_data['Squad_prem_max'] = 0;
 } else {
     $reg_started = true;
     $reg_text = "Registrace bude ukončena " . $datumKonecRegistrace->format('j.n.Y H:i') . " ";
@@ -45,16 +41,18 @@ $regAktivni = $reg_started
 </h2>
 
 <?php
-if (strpos(normalize($match_data['Zavod']), 'tenolix') !== false) {
+
+if (stripos($match_data['Zavod'], 'tenolix') !== false) { 
     include_once __DIR__ . '/include/registrace_tenolix.php';
+} else if ((stripos($match_data['Zavod'], 'mistrovství') !== false) || (stripos($match_data['Zavod'], 'mčr') !== false ) || (stripos($match_data['Zavod'], 'celostátní') !== false)) { 
+    include_once __DIR__ . '/include/registrace_mcr.php';
 } else if ($match_data['Zavod_registrace_hromadna']) {
     include_once __DIR__ . '/include/registrace_bulk.php';
 } else if ($match_data['Zavod_registrace_smeny']) {
     include_once __DIR__ . '/include/registrace_shifts.php';
 } else {
     include_once __DIR__ . '/include/registrace_single.php';
-}
-?>
+}?>
 
 <script type="text/javascript" src="./js/reg_form.js"></script>
 

@@ -98,7 +98,7 @@ function normalizeText(?string $input, int $maxLength = 255): ?string
 }
 
 // Normalizuje retezec
- function normalize(string $str): string
+function normalize(string $str): string
 {
     static $trans = [
         'á' => 'a',
@@ -160,7 +160,7 @@ function ensureTable(mysqli $conn, string $name, string $paramKey, string $param
         // Předání proměnných do dbcreate skriptu
         $_SERVER['dbcreateParam'] = $dbcreateParam;
         $_SERVER['dbcreateTable'] = $dbcreateTable;
-        include_once __DIR__ . '/db/dbcreate.php';
+        include __DIR__ . '/db/dbcreate.php';
     }
 }
 
@@ -168,7 +168,8 @@ function runQuery($query, $name = '')
 {
     global $conn;
     if ($conn->query($query) === TRUE) {
-        echo "<pre style='color:white;font-size:14px;'>$name<br/>Pokračujte klávesou F5</pre>";
+        // echo "<pre style='color:white;font-size:14px;'>$name<br/>Pokračujte klávesou F5</pre>";
+        echo "";
     } else {
         echo "<pre style='color:#ff0000;font-size:14px;'>$name: Chyba – " . $conn->error . "</pre>";
         exit;
@@ -258,11 +259,13 @@ function isValidPassword($password, $username = '', &$errorMessage = '')
 }
 
 // helper pro CSS d-none a required
-function hidden($condition) {
+function hidden($condition)
+{
     return $condition ? 'd-none' : '';
 }
 
-function required($condition) {
+function required($condition)
+{
     return $condition ? 'required' : '';
 }
 
@@ -273,9 +276,9 @@ function require_admin(): void
         && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
     // Pomocná funkce pro logování
-    $logFail = function(string $reason) {
+    $logFail = function (string $reason) {
         $logLine = sprintf(
-            "[%s] Session invalid: %s | IP=%s | UA=%s\n",
+            "[%s] Invalid session: %s | IP=%s | UA=%s\n",
             date('Y-m-d H:i:s'),
             $reason,
             $_SERVER['REMOTE_ADDR'] ?? 'unknown',
@@ -351,3 +354,18 @@ function require_admin(): void
 
     $_SESSION['last_activity'] = time();
 }
+
+// logování přihlášení
+function saveLogin(string $reason, string $usernameInput)
+{
+    $logLine = sprintf(
+        "[%s] %s - %s - %s\n",
+        date('Y-m-d H:i:s'),
+        $reason,
+        $usernameInput,
+        $_SERVER['REMOTE_ADDR']
+    );
+    //$timestamp = date('Y-m-d H:i:s'); 
+    //$logLine = "[$timestamp] $reason - $usernameInput - $_SERVER['REMOTE_ADDR']\n";
+    error_log($logLine, 3, __DIR__ . '/../devadmin/log/admin_login.log');
+};

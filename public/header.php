@@ -43,7 +43,6 @@ $denZavod = $dny[$denZavodEn] ?? '';
 $denPrematchEn = ($datumPrematch)->format('l');
 $denPrematch = $dny[$denPrematchEn] ?? '';
 
-$paymentBeforeClass = ($match_data['Payment_before']) ? '' : 'd-none';
 $isRegistracePozastavena = ($match_data['Zavod_registrace_pozastaveno']);
 
 // Určení pořadatele
@@ -105,7 +104,7 @@ if (!empty($match_data['Zavod_poradatel'])) {
                     <li class="nav-item"><a class="nav-link" href="./">Propozice</a></li>
                     <li class="nav-item"><a class="nav-link" href="./registrace.php">Registrace</a></li>
                     <li class="nav-item <?= (($match_data['Zavod_registrace_smeny']) or (strpos(normalize($match_data['Zavod']), 'tenolix'))) ? "d-none" : ""; ?>"><a class="nav-link" href="./zavodnici.php">Závodníci</a></li>
-                    <li class="nav-item"><a class="nav-link" href="./discipliny.php">Disciplíny</a></li>
+                    <li class="nav-item <?= hidden($match_data['Web_zobrazovat_discipliny'] == 0) ?>"><a class="nav-link" href="./discipliny.php">Disciplíny</a></li>
                     <li class="nav-item <?= hidden($match_data['Web_zobrazovat_vysledky'] == 0) ?>"><a class="nav-link" href="<?= htmlspecialchars($match_data['Zavod_vysledky'] ?? '#', ENT_QUOTES, 'UTF-8'); ?>">Výsledky</a></li>
                     <li class="nav-item"><a class="nav-link" href="./login.php">&nbsp;<i class="fas fa-user-lock" style="font-size:16px"></i>&nbsp;</a></li>
                 </ul>

@@ -13,7 +13,7 @@
                 'Opravdu chcete nevratně vyprázdnit tabulku závodníků? Tato akce odstraní všechny záznamy.',
                 'Doporučeno pouze v testovacím prostředí. Akce je nevratná.',
                 "./save.php",
-                "truncate_table",
+                "shooters_table_truncate",
                 "Vyprázdnit tabulku",
                 "Zrušit"
             );

@@ -1,5 +1,9 @@
 <?php
 include("./header.php");
+
+session_start();
+$_SESSION['token'] = bin2hex(random_bytes(32));
+
 $shooterID = intval($_GET['id']);
 $shooterKEY = intval($_GET['klic']);
 
@@ -13,7 +17,8 @@ if (!$line) {
         "index.php",
         "<div class='col-12 fw-bolder text-danger'>Nelze dohledat závodníka v databázi",
         "Kontaktujte <a href='mailto:" . htmlspecialchars($vyvojar, ENT_QUOTES, 'UTF-8') . "?subject=" . htmlspecialchars($match_data['Zavod'], ENT_QUOTES, 'UTF-8') . " - chyba dohledání zavodnika'>pořadatele závodu</a>.",
-        "<button type='button' class='btn btn-outline-dark' onclick=\"window.location.href = 'index.php';\">Zavřít</button>"
+        "<button type='button' class='btn btn-outline-dark' onclick=\"window.location.href = 'index.php';\">Zavřít</button>",
+        "$poradatel"
     );
     exit;
 }
@@ -26,7 +31,8 @@ if ($line['Disciplina'] == 'VYRAZENO') {
         "index.php",
         "Závodník " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " je už vyřazený.",
         "Pokud jste tuto akci neprovedli, neprodleně nás kontaktujte.",
-        "<button type='button' class='btn btn-outline-dark' onclick=\"window.location.href = 'index.php';\">Zavřít</button>"
+        "<button type='button' class='btn btn-outline-dark' onclick=\"window.location.href = 'index.php';\">Zavřít</button>",
+        "$poradatel"
     );
     exit;
 }
@@ -45,6 +51,7 @@ else {
         "Pokud jste provedli platbu registračního poplatku,<br>můžete místo vyřazení přenést startovné na jiného závodníka.",
         "./save.php",
         "cancel_shooter",
-        "Vyřadit závodníka"
+        "Vyřadit závodníka",
+        "$poradatel"
     );
 }

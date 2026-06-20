@@ -231,7 +231,6 @@ function renderCompetitorsSection(
                     echo "<td class='functions'>";
     ?>
                     <div class="btn-group" role="group">
-                        <?php if ($_SESSION['role'] === 'admin' or  $_SESSION['role'] === 'editor'): ?>
                             <?php if (!$jeBulk): ?>
                                 <!-- SINGLE registrace -->
                                 <button data-id="<?= (int)$line['Cislo'] ?>" href="#info_shooter"
@@ -258,7 +257,7 @@ function renderCompetitorsSection(
                                 </button>
                             <?php endif; ?>
 
-                            <?php if (!$jeBulk && ($line['Disciplina'] ?? '') != "VYRAZENO"): ?>
+                            <?php if (($_SESSION['role'] === 'admin' ||  $_SESSION['role'] === 'editor') && !$jeBulk && ($line['Disciplina'] ?? '') != "VYRAZENO"): ?>
                                 <!-- SINGLE registrace -->
                                 <button data-id="<?= (int)$line['Cislo'] ?>" data-key="<?= (int)$line['Klic'] ?>" href="#send_regmail"
                                     class="modal_regmail btn text-secondary"
@@ -267,14 +266,14 @@ function renderCompetitorsSection(
                                     <i class="fas fa-envelope"></i> E-mail
                                     <span class="bulk-label"></span>
                                 </button>
-                            <?php elseif (!$jeBulk && ($line['Disciplina'] ?? '') == "VYRAZENO"): ?>
+                            <?php elseif (($_SESSION['role'] === 'admin' ||  $_SESSION['role'] === 'editor') && !$jeBulk && ($line['Disciplina'] ?? '') == "VYRAZENO"): ?>
                                 <button data-id="<?= (int)$line['Cislo'] ?>" data-key="<?= (int)$line['Klic'] ?>" href="#send_regmail"
                                     class="modal_regmail btn text-secondary disabled"
                                     data-bs-toggle="modal" data-bs-backdrop="static" data-bs-keyboard="false"
                                     title="Poslat registrační e-mail">
                                     <i class="fas fa-envelope"></i> E-mail
                                 </button>
-                            <?php elseif (!in_array($bulkId, $zobrazenoBulkEmail, true)): ?>
+                            <?php elseif (($_SESSION['role'] === 'admin' ||  $_SESSION['role'] === 'editor') && !in_array($bulkId, $zobrazenoBulkEmail, true)): ?>
                                 <!-- První závodník v BULK -->
                                 <?php $zobrazenoBulkEmail[] = $bulkId; ?>
                                 <button data-id="<?= (int)$line['Cislo'] ?>" data-key="<?= (int)$line['Klic'] ?>" bulk-key="<?= (int)$bulkId ?>" href="#send_bulk_regmail"
@@ -290,7 +289,7 @@ function renderCompetitorsSection(
                                     <i class="fas fa-envelope"></i> E-mail
                                 </button>
                             <?php endif; ?>
-                        <?php endif; ?>
+
                         <?php if (($_SESSION['role'] === 'admin') || (($line['Disciplina'] ?? '') != "VYRAZENO" && $_SESSION['role'] === 'editor')): ?>
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn text-secondary" data-bs-toggle="dropdown" aria-expanded="false" title="Další akce">
@@ -465,7 +464,7 @@ include __DIR__ . '/header.php';
             <?= renderCompetitorsSection($conn, (string)$table, (array)$match_data, (string)$dnes, (string)$paymentBeforeClass, (string)$hromadnaRegistraceClass) ?>
         </div>
     </div>
-    <div class="footer">SSAŠ střelnice Prachatice &copy; Milan Žídek <?= date("Y") ?><span style="float:right">Shooting match registration system 3.2</span></div>
+    <div class="footer">SSAŠ střelnice Prachatice &copy; Milan Žídek <?= date("Y") ?><span style="float:right">Shooting match registration system 3.8</span></div>
 </div>
 <?php
 include_once("./include/match_config.php");
@@ -473,8 +472,8 @@ include_once("./include/new.php");
 include_once("./include/admin_smeny.php");
 include_once("./include/disciplines.php");
 include_once("./include/users.php");
-include_once("./include/reg_fee.php");
-include_once("./include/password_change.php");
+include_once("./include/fee.php");
+include_once("./include/user_password_change.php");
 include_once("./include/pass_values.php");
 include_once("./include/truncate_table.php");
 ?>

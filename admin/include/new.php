@@ -14,6 +14,7 @@ $paymentBeforeClass = !empty($match_data['Payment_before']) ? '' : 'd-none';
             </div>
             <div class="modal-body">
                 <form class="row needs-validation" method="post" action="./save.php" novalidate>
+                    <input type='hidden' name='action' value='shooter_new'>
                     <?php
                     list($usec, $sec) = explode(" ", microtime());
                     echo "<INPUT TYPE=HIDDEN NAME=datreg VALUE=" . $sec . ">";

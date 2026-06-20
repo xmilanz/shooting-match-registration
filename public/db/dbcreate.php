@@ -108,8 +108,8 @@ switch ($dbcreateParam) {
     parName varchar(20) UNIQUE not null,
     parValue varchar(50),
     parValueI FLOAT(9,3),
-\tparNote1 varchar(100) DEFAULT NULL,
-\tparNote2 varchar(100) DEFAULT NULL
+    parNote1 varchar(100) DEFAULT NULL,
+    parNote2 varchar(100) DEFAULT NULL
     )";
         runQuery($query, "Tabulka [$dbcreateTable] byla vytvořena");
         $query = "INSERT into $dbcreateTable (parName,parValueI) VALUES ('dbver',2)";
@@ -136,8 +136,8 @@ switch ($dbcreateParam) {
         runQuery($query, "Tabulka [$dbcreateTable] byla vytvořena");
         // vytvorime demo admin ucet s OTP
         $query = "insert into $dbcreateTable (username,password,email,firstname,lastname,role,organizer,last_password_change,force_password_change) values
-\t('demo', '$password', 'demo@example.com', 'John', 'Doe', 'admin', 'all',NOW(),'1')
-\t";
+        ('demo', '$password', 'demo@example.com', 'John', 'Doe', 'admin', 'all',NOW(),'1')
+";
         runQuery($query, "Tabulka [$dbcreateTable] byla aktualizována");
         // zobrazime modal s heslem k demo uctu
         echo '
@@ -233,8 +233,8 @@ switch ($dbcreateParam) {
     )';
         runQuery($query, "Tabulka [$dbcreateTable] byla vytvořena");
         $query = "insert into $dbcreateTable (Name,Value,Description) values
-\t('MaO', 'Mala odstrelovacka','Ukazkova disciplina')
-\t";
+        ('MaO', 'Mala odstrelovacka','Ukazkova disciplina')
+        ";
         runQuery($query, "Tabulka [$dbcreateTable] byla aktualizována");
         break;
 
@@ -246,10 +246,10 @@ switch ($dbcreateParam) {
     )';
         runQuery($query, "Tabulka [$dbcreateTable] byla vytvořena");
         $query = "insert into $dbcreateTable (Count,Value) values
-\t('1', '250'),
-\t('2', '150'),
-\t('3', '200')
-\t";
+        ('1', '250'),
+        ('2', '150'),
+        ('3', '200')
+        ";
         runQuery($query, "Tabulka [$dbcreateTable] byla aktualizována");
         break;
 }

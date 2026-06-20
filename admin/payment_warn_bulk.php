@@ -23,6 +23,6 @@ WarningModalForm(
     "Závodník " . htmlspecialchars($line['Jmeno']) . " " . htmlspecialchars($line['Prijmeni']) . " nezaplatil startovné.",
     "Pošleme závodníkovi upozornění na nezaplacení startovného všech zaregistrovaných disciplín.",
     "./send.php",
-    "bulk_payment_warn",
+    "payment_bulk_warn",
     "Poslat urgenci hromadné platby"
 );

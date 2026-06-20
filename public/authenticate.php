@@ -10,7 +10,6 @@ if ($usernameInput === '' || $passwordInput === '') {
     exit('Zadejte jméno a heslo');
 }
 
-// pri pouzivani dedikovane administrace to neni potreba
 if ($stmt = $conn->prepare("SELECT id, password, role, organizer,force_password_change FROM $table_admins WHERE username = ? LIMIT 1")) {
     $stmt->bind_param('s', $usernameInput);
     $stmt->execute();
@@ -32,6 +31,7 @@ if ($stmt = $conn->prepare("SELECT id, password, role, organizer,force_password_
             $_SESSION['role']          = $role;
             $_SESSION['organizer']     = $organizer;
             $_SESSION['loggedin']      = true;
+            $_SESSION['token']         = bin2hex(random_bytes(32));
 
             // Bezpečnostní metadata
             $_SESSION['user_agent']    = $_SERVER['HTTP_USER_AGENT'] ?? '';
@@ -44,14 +44,17 @@ if ($stmt = $conn->prepare("SELECT id, password, role, organizer,force_password_
             if ($force_password_change == 1) {
                 // Redirect na zmenu hesla
                 header('Location: password_change.php');
+                saveLogin("Successful login (forced password change)",$usernameInput);
                 exit;
             }
 
             // Redirect do administrace
             header('Location: ' . $admin_url);
             $stmt->close();
+            saveLogin("Successful login",$usernameInput);
             exit;
         } else {
+            saveLogin("Unsuccessful login (password)",$usernameInput);
             include __DIR__ . '/components/modal-warning.php';
             WarningModal(
                 "Přihlášení do administrace závodu",
@@ -62,6 +65,7 @@ if ($stmt = $conn->prepare("SELECT id, password, role, organizer,force_password_
             );
         }
     } else {
+        saveLogin("Unsuccessful login (username)",$usernameInput);
         include __DIR__ . '/components/modal-warning.php';
         WarningModal(
             "Přihlášení do administrace závodu",

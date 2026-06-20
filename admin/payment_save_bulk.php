@@ -23,6 +23,6 @@ WarningModalForm(
     "Závodník " . htmlspecialchars($line['Jmeno']) . " " . htmlspecialchars($line['Prijmeni']) . " zaplatil startovné všech disciplín.",
     "Zaevidujeme platbu a pošleme závodníkovi potvrzení.",
     "./save.php",
-    "mark_bulk_payment",
+    "payment_save_bulk",
     "Zaevidovat hromadnou platbu"
 );

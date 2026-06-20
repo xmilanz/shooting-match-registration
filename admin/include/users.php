@@ -29,11 +29,17 @@
                             while ($line = $result_names->fetch_assoc()) {
                             ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($line['username']) ?></td>
-                                    <td style="width:140px;" class="editable" data-table="$table_admins" data-field="password" data-id="<?= $line['id'] ?>"></td>
+                                    <td>
+                                        <?= htmlspecialchars($line['username']) ?>
+                                    </td>
+                                    <td style="width:140px;"
+                                        class="editable"
+                                        data-table="<?= $table_admins ?>"
+                                        data-field="password" data-id="<?= $line['id'] ?>">
+                                    </td>
                                     <td
                                         class="editable-toggle"
-                                        data-table="$table_admins"
+                                        data-table="<?= $table_admins ?>"
                                         data-field="force_password_change"
                                         data-id="<?= $line['id'] ?>">
                                         <div class="form-check form-switch m-0 d-flex justify-content-center">
@@ -44,15 +50,38 @@
                                                 <?= (int)$line['force_password_change'] === 1 ? 'checked' : '' ?>>
                                         </div>
                                     </td>
-                                    <td class="editable" data-table="$table_admins" data-field="email" data-id="<?= $line['id'] ?>"><?= htmlspecialchars($line['email']) ?></td>
-                                    <td class="editable" data-table="$table_admins" data-field="firstname" data-id="<?= $line['id'] ?>"><?= htmlspecialchars($line['firstname']) ?></td>
-                                    <td class="editable" data-table="$table_admins" data-field="lastname" data-id="<?= $line['id'] ?>"><?= htmlspecialchars($line['lastname']) ?></td>
-                                    <td class="editable text-center" data-table="$table_admins" data-field="role" data-id="<?= $line['id'] ?>"><?= htmlspecialchars($line['role']) ?></td>
-                                    <td class="editable text-center" data-table="$table_admins" data-field="organizer" data-id="<?= $line['id'] ?>"><?= htmlspecialchars($line['organizer']) ?></td>
-                                    <td class="save-cell" data-id="<?= $line['id'] ?>">
+                                    <td class="editable"
+                                        data-table="<?= $table_admins ?>"
+                                        data-field="email" data-id="<?= $line['id'] ?>"><?= htmlspecialchars($line['email']) ?>
+                                    </td>
+                                    <td class="editable"
+                                        data-table="<?= $table_admins ?>"
+                                        data-field="firstname" data-id="<?= $line['id'] ?>"><?= htmlspecialchars($line['firstname']) ?>
+                                    </td>
+                                    <td class="editable"
+                                        data-table="<?= $table_admins ?>"
+                                        data-field="lastname" data-id="<?= $line['id'] ?>"><?= htmlspecialchars($line['lastname']) ?>
+                                    </td>
+                                    <td class="editable text-center"
+                                        data-table="<?= $table_admins ?>"
+                                        data-field="role"
+                                        data-id="<?= $line['id'] ?>"><?= htmlspecialchars($line['role']) ?>
+                                    </td>
+                                    <td class="editable text-center"
+                                        data-table="<?= $table_admins ?>"
+                                        data-field="organizer"
+                                        data-id="<?= $line['id'] ?>"><?= htmlspecialchars($line['organizer']) ?>
+                                    </td>
+                                    <td class="save-cell"
+                                        data-id="<?= $line['id'] ?>">
                                         <button class="btn btn-sm btn-success me-1" disabled><i class="bi bi-check-lg"></i></button>
                                         <button class="btn btn-sm btn-secondary" disabled><i class="bi bi-x-lg"></i></button>
-                                        <form action="./save.php" method="POST" class="d-inline"> <input type="hidden" name="delete_user" value="1"> <input type="hidden" name="username" value="<?= $line['username'] ?>"> <button type="submit" class="btn btn-sm btn-danger ms-2"> <i class="bi bi-trash3 mx-2"></i> </button> </form>
+                                        <form action="./save.php" method="POST" class="d-inline">
+                                            <input type='hidden' name='action' value='user_delete'>
+                                            <input type="hidden" name="username" value="<?= $line['username'] ?>">
+                                            <button type="submit" class="btn btn-sm btn-danger ms-2"> <i class="bi bi-trash3 mx-2"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             <?php
@@ -60,6 +89,7 @@
                             }
                             ?>
                             <form class="needs-validation" method="post" action="./save.php" onsubmit="return validatePassword()" validate>
+                                <input type='hidden' name='action' value='user_new'>
                                 <tr>
                                     <td><input class="form-control" type="text" name="Username" id="Username" placeholder="jan.novak" onfocus="this.placeholder = ''" onblur="this.placeholder = 'jan.novak';replaceChars()" required></td>
                                     <td colspan="2"><input class="form-control" type="password" name="Heslo" id="Heslo" class="form-control" required></td>
@@ -116,26 +146,46 @@
     </div>
 </div>
 
-<script>document.querySelectorAll(".editable-toggle input[type='checkbox']").forEach((checkbox) => {
-    checkbox.addEventListener("change", function () {
-        const cell = this.closest(".editable-toggle");
-        const table = cell.dataset.table;
-        const field = cell.dataset.field;
-        const id = cell.dataset.id;
-        const value = this.checked ? 1 : 0;
+<script>
+    document.querySelectorAll(".editable-toggle input[type='checkbox']").forEach((checkbox) => {
+        checkbox.addEventListener("change", function() {
+            const cell = this.closest(".editable-toggle");
+            const table = cell.dataset.table;
+            const field = cell.dataset.field;
+            const id = cell.dataset.id;
+            const value = this.checked ? 1 : 0;
 
-        fetch("./save.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `update=1&table=${encodeURIComponent(table)}&id=${encodeURIComponent(id)}&field=${encodeURIComponent(field)}&value=${encodeURIComponent(value)}`
-        }).then(() => {
-            const row = cell.closest("tr");
-            row?.classList.add("table-warning");
+            fetch("./save.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `action=inline_edit&table=${encodeURIComponent(table)}&id=${encodeURIComponent(id)}&field=${encodeURIComponent(field)}&value=${encodeURIComponent(value)}`
+            }).then(() => {
+                const row = cell.closest("tr");
+                row?.classList.add("table-warning");
 
-            setTimeout(() => {
-                row?.classList.remove("table-warning");
-            }, 800);
+                setTimeout(() => {
+                    row?.classList.remove("table-warning");
+                }, 800);
+            });
         });
     });
-});
+</script>
+
+<script>
+    document.querySelectorAll(".editable-toggle input").forEach((el) => {
+        el.addEventListener("change", function() {
+            const td = this.closest("td");
+            const value = this.checked ? 1 : 0;
+
+            fetch("./save.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `action=inline_edit&table=${td.dataset.table}&id=${td.dataset.id}&field=${td.dataset.field}&value=${value}`
+            });
+        });
+    });
 </script>

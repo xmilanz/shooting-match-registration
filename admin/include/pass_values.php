@@ -1,36 +1,3 @@
-<!-- INFORMACE O ZAVODNIKOVI S EDITACI -->
-<div class="modal fade" id="info_shooter" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-center">
-                <h4 class="modal-title text-white w-100 fw-bold">Informace o závodníkovi</h4>
-                <br>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.href = 'index.php';"></button>
-            </div>
-            <div class="modal-body">
-                <form class="needs-validation mb-0" method="post" action="./save.php">
-                    <div id="modal-info-included">Načítám...</div>
-            </div>
-            <div class="modal-footer border-top-0 mt-3 col-12">
-                <button type="submit" name="edit_shooter" class="btn btn-success">Uložit závodníka</button>
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.href = 'index.php';">Zavřít bez uložení</button>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-    $('.modal_info_shooter').click(function() {
-        var ID = $(this).data('id'); // Získáme ID z data-id
-        $('#modalID').val(ID); // Uložíme ID do skrytého inputu
-
-        $.post("information.php", {
-            ID: ID
-        }, function(result) {
-            $("#modal-info-included").html(result); // Naplníme pouze obsah modalu
-        });
-    });
-</script>
-
 <!-- MAZANI ZAVODNIKA -->
 <div class="modal fade" id="delete_shooter" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
     <div class="modal-dialog modal-notify modal-warning" role="document">
@@ -49,6 +16,48 @@
             success: function(result) {
                 $(".modal-content").html(result);
             }
+        });
+    });
+</script>
+
+<!-- INFORMACE O ZAVODNIKOVI S EDITACI -->
+<div class="modal fade" id="info_shooter" tabindex="-1" role="dialog"
+    data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-center">
+                <h4 class="modal-title text-white w-100 fw-bold">Informace o závodníkovi</h4>
+                <br>
+                <button type="button" class="btn-close btn-close-white"
+                    data-bs-dismiss="modal" aria-label="Close"
+                    onclick="window.location.href = 'index.php';"></button>
+            </div>
+            <form class="needs-validation mb-0" method="post" action="./save.php">
+                <div class="modal-body">
+                    <input type="hidden" name="action" value="shooter_edit">
+                    <div id="modal-info-included">Načítám...</div>
+                </div>
+                <div class="modal-footer border-top-0 mt-3 col-12">
+                    <button <?= disabled($_SESSION['role'] === 'viewer'); ?> type="submit" class="btn btn-success">Uložit závodníka</button>
+                    <button type="button" class="btn btn-outline-dark"
+                        data-bs-dismiss="modal" aria-label="Close"
+                        onclick="window.location.href = 'index.php';">
+                        Zavřít bez uložení
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $('.modal_info_shooter').click(function() {
+        var ID = $(this).data('id'); // Získáme ID z data-id
+        $('#modalID').val(ID); // Uložíme ID do skrytého inputu
+
+        $.post("information.php", {
+            ID: ID
+        }, function(result) {
+            $("#modal-info-included").html(result); // Naplníme pouze obsah modalu
         });
     });
 </script>

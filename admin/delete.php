@@ -22,6 +22,6 @@ WarningModalForm(
     "Opravdu chcete smazat závodníka " . htmlspecialchars($line['Jmeno']) . " " . htmlspecialchars($line['Prijmeni']) . " (" . $nazev_discipliny . ")?",
     "Tato akce je nevratná, rozmyslete si to pořádně!!!",
     "./save.php",
-    "delete_shooter",
+    "shooter_delete",
     "Smazat závodníka"
 );

@@ -22,17 +22,14 @@ function WarningModal(
                     <button type='button' class='btn-close btn-close-white' data-bs-dismiss='modal' aria-label='Close' onclick=\"window.location.href = '$WarnCloseHref';\"></button>
                 </div>
                 <div class='modal-body text-center pb-0'>
-                    <div class='fw-bolder text-$WarnColor'>
-                        $WarnMessage
-                    </div>
-                    <div class='alert alert-info fw-normal text-center my-3 mx-2' role='alert'>
-                        $WarnInfo
-                    </div>
+                    <div class='fw-bolder text-$WarnColor'>$WarnMessage</div>
+                    <div class='alert alert-info fw-normal text-center my-3 mx-2' role='alert'>$WarnInfo</div>
                 </div>
-  		    <div class='modal-footer border-top-0'>
-   			    <button type='button' class='btn btn-outline-dark' onclick=\"window.location.href = '$WarnCloseHref';\">$CancelLabel</button>
+    		    <div class='modal-footer border-top-0'>
+     			    <button type='button' class='btn btn-outline-dark' onclick=\"window.location.href = '$WarnCloseHref';\">$CancelLabel</button>
+     		    </div>
    		    </div>
-   		</div>
+   	   </div>
    	</div>
 ";
 }
