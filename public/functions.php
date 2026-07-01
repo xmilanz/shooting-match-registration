@@ -258,6 +258,21 @@ function isValidPassword($password, $username = '', &$errorMessage = '')
     return true;
 }
 
+// helper pro odkaz "přidat do kalendáře" v registračním e-mailu
+function buildCalendarLinks(string $reg_url, array $match_data): string
+{
+    $url = htmlspecialchars($reg_url, ENT_QUOTES, 'UTF-8') . '/calendar.php';
+    return "<a href='$url'>přidat do kalendáře</a>";
+}
+
+// helper pro odkaz "přidat do kalendáře" v registračním e-mailu
+function buildCancelLinks(string $reg_url, string $cislo, string $klic): string
+{
+    $url = htmlspecialchars($reg_url, ENT_QUOTES, 'UTF-8') . '/zrus_ucast.php?id=' . rawurlencode($cislo) . '&klic=' . rawurlencode($klic) . '';
+    return "<a href='$url'>zrušit účast</a>";
+}
+
+
 // helper pro CSS d-none a required
 function hidden($condition)
 {

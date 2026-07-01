@@ -20,6 +20,7 @@ ensureTable($conn, $table_setting, 'setting', $table . '_setting');
 ensureTable($conn, $table, 'main', $table);
 ensureTable($conn, $table_matches, 'match_config', $table_matches);
 ensureTable($conn, $table_disciplines, 'disciplines', $table . '_disciplines');
+ensureTable($conn, $table_disciplines, 'categories', $table . '_categories');
 ensureTable($conn, $table_fee, 'fee', $table . '_fee');
 ensureTable($conn, $table_admins, 'site_admins', $table_admins);
 
@@ -28,6 +29,7 @@ $installed =
     ensureTable($conn, $table,             'main',        $table) |
     ensureTable($conn, $table_matches,     'match_config',$table_matches) |
     ensureTable($conn, $table_disciplines, 'disciplines', $table . '_disciplines') |
+    ensureTable($conn, $table_disciplines, 'categories', $table . '_categories') |
     ensureTable($conn, $table_fee,         'fee',         $table . '_fee') |
     ensureTable($conn, $table_admins,      'site_admins', $table_admins);
 
@@ -74,11 +76,12 @@ $migrations = [
     '3.1' => 'dbupdate31.php',
     '3.2' => 'dbupdate32.php',
     '3.3' => 'dbupdate33.php',
+    '3.4' => 'dbupdate34.php',
 ];
 
-$res = $conn->query("SELECT parValueI FROM $table_setting WHERE parName='dbver' LIMIT 1");
+$res = $conn->query("SELECT parValue FROM $table_setting WHERE parName='dbver' LIMIT 1");
 $row = $res ? $res->fetch_assoc() : null;
-$currentVersion = $row['parValueI'] ?? '0';
+$currentVersion = $row['parValue'] ?? '0';
 
 foreach ($migrations as $version => $script) {
     if (version_compare($currentVersion, $version, '<')) {

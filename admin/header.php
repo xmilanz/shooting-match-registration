@@ -12,6 +12,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+
 // kontrola přihlášení
 $table = $_SESSION['zavod_id'];
 
@@ -160,6 +161,7 @@ $dnes = (new DateTime())->format("Y-m-d H:i:s");
                                 <?php endif; ?>
                             <?php endif; ?>
                             <li><a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#manage_disciplines">Disciplíny</a></li>
+                            <li><a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#manage_categories">Kategorie</a></li>
                             <li>
                                 <a class="dropdown-item" href="" data-bs-toggle="modal"
                                     data-bs-target="#manage_fee">Startovné</a>

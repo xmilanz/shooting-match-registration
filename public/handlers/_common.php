@@ -1,5 +1,9 @@
 <?php
-
+/*
+error_log('SESSION token: ' . ($_SESSION['token'] ?? 'NONE'));
+error_log('POST token: '    . ($_POST['token']    ?? 'NONE'));
+error_log('SESSION ID: '    . session_id());
+*/
 // --- kontrola CSRF tokenu ---
 
 if (!isset($_POST['token'], $_SESSION['token']) || $_POST['token'] !== $_SESSION['token']) {

@@ -31,7 +31,7 @@ if (!$result) {
 /* aktualizace verze databaze */
 $result = $conn->query("
     UPDATE $table_setting
-    SET parValueI='2.9'
+    SET parValue='2.9'
     WHERE parName='dbver'
 ");
 

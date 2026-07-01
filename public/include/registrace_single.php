@@ -9,6 +9,15 @@ while ($row = $result->fetch_assoc()) {
     $popisy_disciplin[$id] = $row['Description'];
 }
 
+// Načtení kategorií
+$nazvy_kategorii = $zkratky_kategorii = [];
+$result = $conn->query("SELECT * FROM $table_categories ORDER BY Id");
+while ($row = $result->fetch_assoc()) {
+    $id = $row['Id'];
+    $nazvy_kategorii[$id] = $row['Value'];
+    $zkratky_kategorii[$id] = $row['Name'];
+}
+
 // Načteme počty všech disciplin
 $counts = [];
 $sqlCounts = "SELECT Disciplina, COUNT(*) AS count FROM " . $table . " GROUP BY Disciplina";
@@ -154,7 +163,7 @@ foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
                 <?= required($match_data['Zavod_obcansky_prukaz'] == 1); ?>>
             <div class="invalid-feedback">Nevyplnili jste číslo OP / EZP<br>(u juniora bez OP napište 0000000000)</div>
         </div>
-        
+
         <div class="col-md-3 mt-5 <?= hidden($match_data['Zavod_obcansky_prukaz'] == 0); ?>">
             <label class="form-check-label" for="ZbrojniOpravneni<?= $zkratka ?>">
                 <input class="me-1" type="checkbox" class="form-check-input" id="ZbrojniOpravneni<?= $zkratka ?>"
@@ -163,9 +172,17 @@ foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
         </div>
         <div class="col-md-2">
             <label for="Kategorie" class="form-label mt-3">Kategorie</label>
-            <select class="form-select" name="Kategorie" id="Kategorie<?= $zkratka ?>">
-                <option value="Regular" selected>Regular</option>
-                <option value="Junior">Junior</option>
+            <select class="form-select" name=Kategorie required>
+                <option value="" selected>--- vyberte ---</option>
+                <?php
+                $stmt = $conn->prepare("SELECT * from $table_categories ORDER BY Id");
+                $stmt->execute();
+                $result_names = $stmt->get_result();
+                while ($line = $result_names->fetch_array()) {
+                    echo "<option value=" . $line['Name'] . ">" . $line['Value'] . "</option>";
+                }
+                $stmt->close();
+                ?>
             </select>
         </div>
         <div class="col-md-2">
@@ -202,7 +219,7 @@ foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
 
     <div class="row px-4 mt-3">
         <div class="alert alert-danger m-lg-2 <?= hidden($match_data['Zavod_cislo_zbrane'] == 0); ?>" role="alert">
-            Při prezenci se eviduje také VÝROBNÍ ČÍSLO ZBRANĚ. Můžete ho vyplnit zde ve formuláři nebo si jej přineste s sebou <small>(napsané na papíru, vytisknutý výpis ze zbrojního listu nebo online v Portálu občana).</small>
+            Protože se eviduje VÝROBNÍ ČÍSLO ZBRANĚ, přineste si s sebou na prezenci výpis ze zbrojního listu pro jeho kontrolu.
         </div>
         <div class="alert alert-info m-lg-2" role="alert">
             Pokud sdílíte zbraň s jiným závodníkem, napište do poznámky jeho jméno a příjmení.

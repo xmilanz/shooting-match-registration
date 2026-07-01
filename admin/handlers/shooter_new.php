@@ -139,7 +139,9 @@ $varsymbol = $varsymbol_new;
 
 $dnes = date_format(new DateTime(), "d.m.Y H:i");
 $mena = $match_data['Banka_ucet_MENA'];
-$link_cancel = "<a href='$web_adresa_admin/zrus_ucast.php?id=$line[Cislo]&klic=$line[klic]'><strong>zrušit účast</strong></a>";
+
+$link_cancel = buildCancelLinks($web_adresa_admin, $cislo, $klic);
+$link_ical = buildCalendarLinks($web_adresa_admin, $match_data);
 
 // podmínky pro volbu textu v závislosti na statutu závodníka
 if ($isVIP) {
@@ -175,7 +177,7 @@ if ($isVIP) {
 // nice názvy pro mail
 $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
 
-$STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel]\r\n";
+$STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel] [$link_ical]\r\n";
 $STRELEC .= "Kategorie: $kategorie" . "\r\n";
 $STRELEC .= "Discpilína: $nazev_discipliny" . "\r\n\r\n";
 $STRELEC .= "<i>Rozhodčí: $Rozhodci" . "\r\n";

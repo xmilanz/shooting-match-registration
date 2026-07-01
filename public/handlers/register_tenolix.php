@@ -144,7 +144,10 @@ $STRELEC_ROCNIK = "Ročník: " . htmlspecialchars($rocnik, ENT_QUOTES, 'UTF-8') 
 $STRELEC_KATEGORIE = "Kategorie: $nazev_kategorie" . "\r\n";
 $STRELEC_TRENINK = "Trénink: " . ($trenink ? "ANO" : "NE") . "\r\n";
 $STRELEC_CASTKA = "Částka: $CastkaZaplatit  " . $match_data['Banka_ucet_MENA'] . "";
-$link_cancel = "<a href='" . htmlspecialchars($reg_url, ENT_QUOTES, 'UTF-8') . "/zrus_ucast.php?id=" . rawurlencode($cislo) . "&klic=" . rawurlencode($line['klic']) . "'><strong>zrušit účast</strong></a>";
+
+//$link_cancel = "<a href='" . htmlspecialchars($reg_url, ENT_QUOTES, 'UTF-8') . "/zrus_ucast.php?id=" . rawurlencode($cislo) . "&klic=" . rawurlencode($line['klic']) . "'><strong>zrušit účast</strong></a>";
+$link_cancel = buildCancelLinks($reg_url, $cislo, $klic);
+$link_ical = buildCalendarLinks($reg_url, $match_data);
 
 include './components/modal-warning.php';
 WarningModal(
@@ -167,7 +170,7 @@ WarningModal(
 );
 
 // posilame mail zavodnikovi
-$STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel] " . "\r\n";
+$STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel] [$link_ical] " . "\r\n";
 $STRELEC .= "Zodpovědná osoba: " . htmlspecialchars($zodpovednaOsoba, ENT_QUOTES, 'UTF-8') . "\r\n";
 $STRELEC .= "Ročník: " . htmlspecialchars($rocnik, ENT_QUOTES, 'UTF-8') . "\r\n";
 $STRELEC .= "Kategorie: $nazev_kategorie" . "\r\n";
@@ -250,3 +253,4 @@ if (!$send_email) {
     $stmt->close();
 }
 include "./footer.php";
+?>

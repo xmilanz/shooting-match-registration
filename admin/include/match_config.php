@@ -121,16 +121,25 @@ $admin_feature = ($_SESSION['role'] === 'admin') ? '' : 'd-none';
                                     <fieldset class="border p-3 my-3 rounded">
                                         <legend class="float-none w-auto px-2 h6">Zobrazovat na úvodní stránce a v menu webu</legend>
                                         <div class="row">
-                                            <div class="col-md-4">
+                                            <div class="col-md-3">
                                                 <?php
                                                 echo renderSwitch(
-                                                    'Zavod_zobrazovat_sponzory',
-                                                    "Sponzory",
-                                                    (bool)$match_data['Zavod_zobrazovat_sponzory']
+                                                    'Web_zobrazovat_zavodniky',
+                                                    "Závodníky",
+                                                    (bool)$match_data['Web_zobrazovat_zavodniky']
                                                 );
                                                 ?>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-3">
+                                                <?php
+                                                echo renderSwitch(
+                                                    'Web_zobrazovat_prehledy',
+                                                    "Přehledy",
+                                                    (bool)$match_data['Web_zobrazovat_prehledy']
+                                                );
+                                                ?>
+                                            </div>
+                                            <div class="col-md-3">
                                                 <?php
                                                 echo renderSwitch(
                                                     'Web_zobrazovat_discipliny',
@@ -139,12 +148,23 @@ $admin_feature = ($_SESSION['role'] === 'admin') ? '' : 'd-none';
                                                 );
                                                 ?>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-3">
                                                 <?php
                                                 echo renderSwitch(
                                                     'Web_zobrazovat_vysledky',
                                                     "Výsledky",
                                                     (bool)$match_data['Web_zobrazovat_vysledky']
+                                                );
+                                                ?>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-md-4">
+                                                <?php
+                                                echo renderSwitch(
+                                                    'Zavod_zobrazovat_sponzory',
+                                                    "Sponzory",
+                                                    (bool)$match_data['Zavod_zobrazovat_sponzory']
                                                 );
                                                 ?>
                                             </div>

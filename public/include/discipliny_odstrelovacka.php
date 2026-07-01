@@ -1,18 +1,38 @@
           <div class="accordion accordion-flush px-4" id="disciplines">
-              <!-- A. Opakovací malorážka -->
+
+              <!-- Společné parametry -->
               <div class="accordion-item">
-                  <h2 class="accordion-header" id="headingA">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseA" aria-expanded="false" aria-controls="collapseA">
-        A. Opakovací malorážka se zásobníkem
+                  <h2 class="accordion-header" id="heading0">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse0" aria-expanded="false" aria-controls="collapse0">
+        Parametry společné pro všechny disciplíny
       </button>
     </h2>
-                  <div id="collapseA" class="accordion-collapse collapse" aria-labelledby="headingA" data-bs-parent="#disciplines">
+                  <div id="collapse0" class="accordion-collapse collapse" aria-labelledby="heading0" data-bs-parent="#disciplines">
+                      <div class="accordion-body">
+                          <ul>
+                              <li>rukavice pouze bezprsté</li>
+                              <li>puškohled mechanický, bez omezení zvětšení</li>
+                              <li>pažba bez omezení</li>
+                              <li>střelecké kabáty, řemeny a háky – NE, mimo C, E</li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- A1. Opakovací malorážka -->
+              <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingA">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseA1" aria-expanded="false" aria-controls="collapseA1">
+        A - A1. Opakovací malorážka se zásobníkem
+      </button>
+    </h2>
+                  <div id="collapseA1" class="accordion-collapse collapse" aria-labelledby="headingA1" data-bs-parent="#disciplines">
                       <div class="accordion-body">
                           <strong>Puška</strong>
                           <ul>
                               <li>opakovací nebo samonabíjecí se zásobníkem ráže .22 LR</li>
                               <li>povinnost nabíjet do zásobníku</li>
-                              <li>hlaveň bez omezení</li>
+                              <li>jakékoli doplňky jsou zakázány, mimo původních mířidel</li>
                           </ul>
                           <strong>Přední podpěra</strong>
                           <ul>
@@ -24,7 +44,38 @@
                           <ul>
                               <li>pažba může být podložena pouze rukou nebo zapřena v rameni</li>
                           </ul>
-                          <p><strong>Střelecké kabáty, řemeny a háky – NE</strong></p>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- A2. Opakovací malorážka -->
+              <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingA2">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseA2" aria-expanded="false" aria-controls="collapseA2">
+        A – A2. Opakovací malorážka se zásobníkem
+      </button>
+    </h2>
+                  <div id="collapseA2" class="accordion-collapse collapse" aria-labelledby="headingA2" data-bs-parent="#disciplines">
+                      <div class="accordion-body">
+                          <strong>Puška</strong>
+                          <ul>
+                              <li>cena nové zbraně bez puškohledu nepřesáhne 25 000,- Kč</li>
+                              <li>u starších zbraní rozhodne současná cena nové zbraně</li>
+                              <li>opakovací nebo samonabíjecí se zásobníkem ráže .22 LR</li>
+                              <li>povinnost nabíjet do zásobníku</li>
+                              <li>hlaveň: jakékoli doplňky jsou zakázány, mimo původních mířidel</li>
+                          </ul>
+                          <strong>Přední podpěra</strong>
+                          <ul>
+                              <li>pevné podepření zbraně pouze v předpažbí prostřednictvím bipodu (nožičky) nebo střeleckého vaku</li>
+                              <li>bipod musí být sklopný</li>
+                              <li>k uchycení na pažbu nesmí být použito prodloužení pažby</li>
+                          </ul>
+                          <strong>Zadní podpěra</strong>
+                          <ul>
+                              <li>pažba může být podložena pouze rukou nebo zapřena v rameni</li>
+                          </ul>
+						  <p><em>Při počtu závodníků méně než šest, budou závodníci sloučeni s kategorii D podle pravidel A2.</em></p>
                       </div>
                   </div>
               </div>
@@ -33,7 +84,7 @@
               <div class="accordion-item">
                   <h2 class="accordion-header" id="headingB">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseB" aria-expanded="false" aria-controls="collapseB">
-        B. Malá odstřelovačka STANDARD
+        B. STANDARD
       </button>
     </h2>
                   <div id="collapseB" class="accordion-collapse collapse" aria-labelledby="headingB" data-bs-parent="#disciplines">
@@ -52,7 +103,6 @@
                           <ul>
                               <li>pažba může být podložena pouze rukou nebo zapřena v rameni</li>
                           </ul>
-                          <p><strong>Střelecké kabáty, řemeny a háky – NE</strong></p>
                       </div>
                   </div>
               </div>
@@ -61,7 +111,7 @@
               <div class="accordion-item">
                   <h2 class="accordion-header" id="headingC">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseC" aria-expanded="false" aria-controls="collapseC">
-        C. Malá odstřelovačka OPEN
+        C. OPEN
       </button>
     </h2>
                   <div id="collapseC" class="accordion-collapse collapse" aria-labelledby="headingC" data-bs-parent="#disciplines">
@@ -69,17 +119,8 @@
                           <strong>Puška</strong>
                           <ul>
                               <li>libovolná, ráže .22 LR</li>
-                              <li>hlaveň bez omezení</li>
+                              <li>není žádné omezení</li>
                           </ul>
-                          <strong>Přední podpěra</strong>
-                          <ul>
-                              <li>bez omezení</li>
-                          </ul>
-                          <strong>Zadní podpěra</strong>
-                          <ul>
-                              <li>bez omezení</li>
-                          </ul>
-                          <p><strong>Střelecké kabáty, řemeny a háky – ANO</strong></p>
                       </div>
                   </div>
               </div>
@@ -96,17 +137,9 @@
                           <strong>Puška</strong>
                           <ul>
                               <li>libovolná vzduchovka</li>
-                              <li>hlaveň bez omezení</li>
+                              <li>není žádné omezení</li>
                           </ul>
-                          <strong>Přední podpěra</strong>
-                          <ul>
-                              <li>bez omezení</li>
-                          </ul>
-                          <strong>Zadní podpěra</strong>
-                          <ul>
-                              <li>bez omezení</li>
-                          </ul>
-                          <p><em>Při menším počtu závodníků (v kategorii Vzduchovka) než pět, budou závodníci zařazeni do kategorie B nebo C, podle pravidel těchto kategorií.</em></p>
+                          <p><em>Při počtu závodníků méně než šest, budou závodníci sloučeni s kategorii A2 podle pravidel A2.</em></p>
                       </div>
                   </div>
               </div>
@@ -122,18 +155,9 @@
                       <div class="accordion-body">
                           <strong>Puška</strong>
                           <ul>
-                              <li>libovolná, náboj s centrálním zápalem od ráže .223</li>
-                              <li>hlaveň bez omezení</li>
+                              <li>libovolná na náboj se středovým zápalem</li>
+                              <li>není žádné omezení</li>
                           </ul>
-                          <strong>Přední podpěra</strong>
-                          <ul>
-                              <li>bez omezení</li>
-                          </ul>
-                          <strong>Zadní podpěra</strong>
-                          <ul>
-                              <li>bez omezení</li>
-                          </ul>
-                          <p><strong>Střelecké kabáty, řemeny a háky – ANO</strong></p>
                       </div>
                   </div>
               </div>

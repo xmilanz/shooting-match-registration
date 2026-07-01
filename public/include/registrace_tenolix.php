@@ -19,7 +19,7 @@ if ($resDisc && ($rowDisc = $resDisc->fetch_assoc())) {
 
 // Načtení kategorií
 $kategorie = [];
-$resultKat = $conn->query("SELECT * FROM ssas_k4m_tenolix_categories ORDER BY Id");
+$resultKat = $conn->query("SELECT * FROM $table_categories ORDER BY Id");
 if ($resultKat) {
     while ($row = $resultKat->fetch_assoc()) {
         $katId = (int)$row['Id'];
@@ -157,7 +157,7 @@ foreach ($kategorie as $katId => $kat) {
                 <label class="form-label">Zodpovědná osoba</label>
                 <input class="form-control" type="text" name="ZodpovednaOsoba" id="ZodpovednaOsoba<?= $katCode ?>"
                     onfocus="this.placeholder = ''" placeholder="Příjmení Jméno"
-                    onblur="this.placeholder = 'Příjmení Jméno';replaceChars('<?= $katCode ?>')">
+                    onblur="this.placeholder = 'Příjmení Jméno';replaceChars('<?= $katCode ?>')" required>
                 <div class="invalid-feedback">Nevyplnili jste zodpovědnou osobu</div>
 
                 <label for="Email" class="form-label mt-3">E-mail</label>
@@ -166,22 +166,10 @@ foreach ($kategorie as $katId => $kat) {
                     onblur="replaceChars('<?= $katCode ?>')" required>
                 <div class="invalid-feedback">Nevyplnili jste e-mail</div>
 
-            <label for="ObcanskyPrukaz" class="form-label mt-3">Číslo OP / EZP
-                <a
-                    role="button"
-                    tabindex="0"
-                    id="userInfoBtn"
-                    data-bs-toggle="popover"
-                    data-bs-placement="top"
-                    data-bs-html="true"
-                    data-bs-title="Občanský průkaz a Evrovský zbrojní pas"
-                    data-bs-content="Nemá-li závodník dosud vydaný občanský průkaz<br>(nejčastěji kategorie Junior), napište <strong>0000000000</strong>.<br><br>U cizích státních příslušníků vyplňte číslo identifikačního <br>průkazu i v případě, že obsahuje mezery nebo písmena.">
-                    <sup><i class="fas fa-question-circle text-primary ms-1"></i></sup>
-                </a>
-            </label>
+            <label for="ObcanskyPrukaz" class="form-label mt-3">Číslo OP / EZP</label>
                 <input class="form-control" type="text" name="ObcanskyPrukaz" id="ObcanskyPrukaz<?= $katCode ?>"
-                    placeholder="0123456789 / 0000000000" onfocus="this.placeholder = ''"
-                    onblur="this.placeholder = '0123456789 / 0000000000'" <?= required($match_data['Zavod_obcansky_prukaz'] == 1); ?>>
+                    placeholder="0123456789" onfocus="this.placeholder = ''"
+                    onblur="this.placeholder = '0123456789'" <?= required($match_data['Zavod_obcansky_prukaz'] == 1); ?>>
                 <div class="invalid-feedback">Nevyplnili jste číslo OP / EZP</div>
             </fieldset>
         </div>
@@ -214,7 +202,7 @@ foreach ($kategorie as $katId => $kat) {
 
     <div class="row px-4 mt-3">
         <div class="alert alert-danger m-lg-2 <?= hidden($match_data['Zavod_cislo_zbrane'] == 0); ?>" role="alert">
-            Při prezenci se eviduje také VÝROBNÍ ČÍSLO ZBRANĚ. Můžete ho vyplnit zde ve formuláři nebo si jej přineste s sebou <small>(napsané na papíru, vytisknutý výpis ze zbrojního listu nebo online v Portálu občana).</small>
+            Pro kontrolu VÝROBNÍHO ČÍSLA ZBRANĚ vyplněného ve formuláři při registraci si na prezenci přineste výpis ze zbrojního listu.
         </div>
         <div class="alert alert-info m-lg-2" role="alert">
             Pokud sdílíte zbraň s jiným závodníkem, napište do poznámky jeho jméno a příjmení.

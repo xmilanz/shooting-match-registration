@@ -1,9 +1,6 @@
 <?php
-// tabulka, do které se ukládají závodníci
-$table = "";
-
-// tabulka, do které se ukládá konfigurace jednotlivých závodů, např. "match_config"
-$table_matches = "";
+$table = "dev_ssas_match";
+$table_setting = $table . "_setting";
 
 $table_setting = $table . "_setting";
 $table_admins = "";
@@ -16,6 +13,7 @@ $admin_url = "";
 // podmínky pro sdílené tabulky určitého druhu závodu - příklady
 if (strpos($table, 'k4m') !== false) {
     $table_disciplines = "ssas_k4m_disciplines";
+    $table_categories = "ssas_k4m_categories";
     $table_fee = "ssas_k4m_fee";
     $druh_souteze = "Malorážkový závod na myslivecké terče (liška, srnec, kamzík, prase), tzv. velký standard";
 }
@@ -29,6 +27,9 @@ else {
     $table_fee=$table."_fee";
     $druh_souteze ="stručný popis soutěže";
 }
+
+$table_categories = "ssas_categories";
+
 
 $admin_roles = array(
     "admin" => "přístup ke všem funkcím registračního systému",

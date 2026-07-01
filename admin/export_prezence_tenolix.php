@@ -46,7 +46,7 @@ $match_data = $result_match->fetch_array();
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 
-// ---------- PAGE SETUP (TISK) ----------
+// ---------- NASTAVEBÍ STRÁNKY (TISK) ----------
 
 $sheet->getPageSetup()
     ->setPaperSize(PageSetup::PAPERSIZE_A4)
@@ -54,10 +54,6 @@ $sheet->getPageSetup()
     ->setFitToWidth(null)
     ->setFitToHeight(null);
     
-//for ($r = 19; $r <= $highestRow; $r += 16) {
-//    $sheet->setBreak("A$r", \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::BREAK_ROW);
-//}
-
 // opakování hlavičky (řádky 1–3)
 $sheet->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1, 3);
 
@@ -72,25 +68,16 @@ $sheet->getPageMargins()
 
 // řádek 1
 $sheet->setCellValue('A1', $match_data['Zavod'] . ' - ' . date('d.m.Y') . ' - seznam účastníků');
-$sheet->mergeCells('A1:K1');
+$sheet->mergeCells('A1:L1');
 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(20);
 $sheet->getRowDimension(1)->setRowHeight(30);
 $sheet->getStyle('A1')->getAlignment()
     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
     ->setVertical(Alignment::VERTICAL_TOP);
 
-// řádek 2
-//$sheet->setCellValue('A2', 'Svým podpisem stvrzuji, že jsem se seznámil(a) s Provozním řádem střelnice Prachatice');
-//$sheet->mergeCells('A2:K2');
-//$sheet->getStyle('A2')->getFont()->setItalic(true)->setSize(14);
-//$sheet->getRowDimension(2)->setRowHeight(30);
-//$sheet->getStyle('A2')->getAlignment()
-//    ->setHorizontal(Alignment::HORIZONTAL_CENTER)
-//    ->setVertical(Alignment::VERTICAL_TOP);
-
 // řádek 3 – hlavička tabulky
 $sheet->fromArray(
-    ['Číslo', 'Kategorie', 'Příjmení Jméno', 'Ročník', 'Klub', 'Poznámka', 'Trénink', 'Zaplatit', 'Zodpovědná osoba', 'Občanský průkaz', 'Číslo zbraně'],
+    ['Číslo', 'Kategorie', 'Příjmení Jméno', 'Ročník', 'Klub', 'Poznámka', 'Trénink', 'Zaplatit', 'Zodpovědná osoba', 'Občanský průkaz', 'Číslo zbraně','Podpis'],
     null,
     'A3'
 );
@@ -108,11 +95,11 @@ foreach ($data as $line) {
             $line['Klub'],
             $line['Poznamka'],
             ((int)($line['Trenink'] ?? 0) === 1) ? 'ANO' : 'NE',
-//            ((int)($line['Zaplaceno'] ?? 0) === 1) ? 'ANO' : 'NE',
             $line['CastkaZaplatit'],
             $line['ZodpovednaOsoba'],
             $line['ObcanskyPrukaz'],
             $line['CisloZbrane'],
+            '',
         ],
         null,
         "A$row"
@@ -148,11 +135,11 @@ $bodyStyle = [
 ];
 
 // hlavička tabulky
-$sheet->getStyle("A3:K3")->applyFromArray($headerStyle);
+$sheet->getStyle("A3:L3")->applyFromArray($headerStyle);
 $sheet->getRowDimension(3)->setRowHeight(25);
 
 // tělo tabulky
-$sheet->getStyle("A4:K$highestRow")->applyFromArray($bodyStyle);
+$sheet->getStyle("A4:L$highestRow")->applyFromArray($bodyStyle);
 // tučné jméno
 $sheet->getStyle("C4:C$highestRow")->getFont()->setBold(true)->setSize(11);
 
@@ -160,26 +147,27 @@ $sheet->getStyle("C4:C$highestRow")->getFont()->setBold(true)->setSize(11);
 $sheet->getStyle("A4:B$highestRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 $sheet->getStyle("D4:D$highestRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 $sheet->getStyle("G4:H$highestRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-$sheet->getStyle("K4:K$highestRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+$sheet->getStyle("J4:K$highestRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-// výšky řádků
+// výšky řádků 
 for ($i = 4; $i <= $highestRow; $i++) {
     $sheet->getRowDimension($i)->setRowHeight(20);
 }
 
-// ================= ŠÍŘKY SLOUPCŮ =================
+// šířky aloupců
 
 $sheet->getColumnDimension('A')->setWidth(5);   // Cislo
 $sheet->getColumnDimension('B')->setWidth(10);  // Kategorie
 $sheet->getColumnDimension('C')->setWidth(20);  // PrijmeniJmeno
 $sheet->getColumnDimension('D')->setWidth(7);  // Rocnik
-$sheet->getColumnDimension('E')->setWidth(24);  // Klub
-$sheet->getColumnDimension('F')->setWidth(30);  // Poznamka
+$sheet->getColumnDimension('E')->setWidth(20);  // Klub
+$sheet->getColumnDimension('F')->setWidth(20);  // Poznamka
 $sheet->getColumnDimension('G')->setWidth(8);  // Trenink
 $sheet->getColumnDimension('H')->setWidth(9);  // Zaplatit
 $sheet->getColumnDimension('I')->setWidth(20);  // ZodpovednaOsoba
 $sheet->getColumnDimension('J')->setWidth(18);  // ObcanskyPrukaz
 $sheet->getColumnDimension('K')->setWidth(15);  // CisloZbrane
+$sheet->getColumnDimension('L')->setWidth(30);  // Podpis
 
 // ================= VÝSTUP =================
 

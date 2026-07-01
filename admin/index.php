@@ -98,6 +98,7 @@ function renderCompetitorsSection(
             continue;
         }
         if ($col->name === 'VS') {
+            $fields[] = 'VS';
             $fields[] = 'Statut';
             if ($match_data['Payment_before']) {
                 $fields[] = 'Platba';
@@ -464,13 +465,14 @@ include __DIR__ . '/header.php';
             <?= renderCompetitorsSection($conn, (string)$table, (array)$match_data, (string)$dnes, (string)$paymentBeforeClass, (string)$hromadnaRegistraceClass) ?>
         </div>
     </div>
-    <div class="footer">SSAŠ střelnice Prachatice &copy; Milan Žídek <?= date("Y") ?><span style="float:right">Shooting match registration system 3.8</span></div>
+    <div class="footer">SSAŠ střelnice Prachatice &copy; Milan Žídek <?= date("Y") ?><span style="float:right">Shooting match registration system 3.9</span></div>
 </div>
 <?php
 include_once("./include/match_config.php");
 include_once("./include/new.php");
 include_once("./include/admin_smeny.php");
 include_once("./include/disciplines.php");
+include_once("./include/categories.php");
 include_once("./include/users.php");
 include_once("./include/fee.php");
 include_once("./include/user_password_change.php");

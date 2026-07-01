@@ -50,6 +50,30 @@ $(document).ready(function () {
   }
 });
 
+// categories
+$(document).ready(function () {
+  // Check if URL contains the reopen_modal parameter
+  if (window.location.search.indexOf("categories") > -1) {
+    $("#manage_categories").modal("show");
+  }
+
+  $("#manage_categories").on("hidden.bs.modal", function (e) {
+    if (shouldReopenModal()) {
+      $("#manage_categories").modal("show");
+    }
+  });
+
+  function shouldReopenModal() {
+    return false; // This condition can remain as false for now
+  }
+});
+$(document).ready(function () {
+  if (window.location.search.indexOf("categories") > -1) {
+    // Remove the parameter from URL
+    window.history.replaceState(null, null, window.location.pathname);
+  }
+});
+
 // disciplines
 $(document).ready(function () {
   // Check if URL contains the reopen_modal parameter

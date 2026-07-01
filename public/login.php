@@ -1,7 +1,7 @@
 <?php include "header.php"; ?>
 
 <div class='text-center'>
-    <img src='./images/bkg_ssapt.png'>
+    <img src='./images/bkg_<?= $poradatel ?>.png'>
 </div>
 
 <div id='myModal' class='row modal fade' tabindex='-1'>

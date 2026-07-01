@@ -95,9 +95,17 @@ while ($d = $disciplinesResult->fetch_assoc()) {
                     </div>
                     <div class="col-md-3">
                         <label class="form-label mt-3">Kategorie</label>
-                        <select name="Kategorie" class="form-select">
-                            <option value="Regular" selected>Regular</option>
-                            <option value="Junior">Junior</option>
+                        <select class="form-select" name=Kategorie required>
+                            <option value="" selected>--- vyberte ---</option>
+                            <?php
+                            $stmt = $conn->prepare("SELECT * from $table_categories ORDER BY Id");
+                            $stmt->execute();
+                            $result_names = $stmt->get_result();
+                            while ($line = $result_names->fetch_array()) {
+                                echo "<option value=" . $line['Name'] . ">" . $line['Value'] . "</option>";
+                            }
+                            $stmt->close();
+                            ?>
                         </select>
                     </div>
                     <div class="col-md-4">

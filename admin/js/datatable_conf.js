@@ -3,7 +3,7 @@
 
     function getVisibleColumns(paymentBefore, registraceSmeny) {
         var columnConfig = {
-            "1_0": [2, 5, 6, 10, 11, 12, 13, 14, 15, 16, 17], // předem
+            "1_0": [2, 5, 6, 10, 11, 12, 13, 14, 15, 16, 17, 18], // předem
             "0_0": [2, 5, 6, 10, 11, 12, 13, 14, 15, 20],        // na místě
             "1_1": [1, 2, 5, 6, 10, 11, 12, 13, 14, 15, 16, 17], // předem + směny
             "0_1": [1, 2, 5, 6, 10, 11, 12, 13, 14, 15, 20]       // na místě + směny

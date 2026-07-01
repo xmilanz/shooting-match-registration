@@ -409,6 +409,20 @@ function getRacesForOrganizer(mysqli $conn, string $organizer, array $zavody_pre
     return $result;
 }
 
+// helper pro odkaz "přidat do kalendáře" v registračním e-mailu
+function buildCalendarLinks(string $web_adresa_admin, array $match_data): string
+{
+    $url = htmlspecialchars($web_adresa_admin, ENT_QUOTES, 'UTF-8') . '/calendar.php';
+    return "<a href='$url'>přidat do kalendáře</a>";
+}
+
+// helper pro odkaz "přidat do kalendáře" v registračním e-mailu
+function buildCancelLinks(string $web_adresa_admin, string $cislo, string $klic): string
+{
+    $url = htmlspecialchars($web_adresa_admin, ENT_QUOTES, 'UTF-8') . '/zrus_ucast.php?id=' . rawurlencode($cislo) . '&klic=' . rawurlencode($klic) . '';
+    return "<a href='$url'>zrušit účast</a>";
+}
+
 // helper pro CSS d-none, required a readonly (input form)
 function hidden($condition) {
     return $condition ? 'd-none' : '';

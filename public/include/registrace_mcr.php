@@ -1,38 +1,51 @@
 <?php
-// Načtení disciplín
-$nazvy_disciplin = $zkratky_disciplin = $popisy_disciplin = [];
-$result = $conn->query("SELECT * FROM $table_disciplines ORDER BY Id");
-while ($row = $result->fetch_assoc()) {
-    $id = $row['Id'];
-    $nazvy_disciplin[$id] = $row['Value'];
-    $zkratky_disciplin[$id] = $row['Name'];
-    $popisy_disciplin[$id] = $row['Description'];
+// MČR special: registrace je řízená pouze kategoriemi.
+// Disciplínu řešíme jen interně kvůli uložení do DB (vezmeme 1. z `$table_disciplines`).
+$onlyDisciplineCodeRaw = '';
+$onlyDisciplineCode = '';
+$resDisc = $conn->query("SELECT Name FROM $table_disciplines ORDER BY Id LIMIT 1");
+if ($resDisc && ($rowDisc = $resDisc->fetch_assoc())) {
+    $onlyDisciplineCodeRaw = (string)($rowDisc['Name'] ?? '');
+    $onlyDisciplineCode = htmlspecialchars($onlyDisciplineCodeRaw, ENT_QUOTES, 'UTF-8');
 }
 
-// Načteme počty všech disciplin
-$counts = [];
-$sqlCounts = "SELECT Disciplina, COUNT(*) AS count FROM " . $table . " GROUP BY Disciplina";
-$resCounts = $conn->query($sqlCounts);
-while ($r = $resCounts->fetch_assoc()) {
-    $counts[$r['Disciplina']] = (int)$r['count'];
+// Načtení kategorií
+$kategorie = [];
+$resultKat = $conn->query("SELECT * FROM $table_categories ORDER BY Id");
+if ($resultKat) {
+    while ($row = $resultKat->fetch_assoc()) {
+        $katId = (int)$row['Id'];
+        $kategorie[$katId] = [
+            'Name' => (string)$row['Name'],
+            'Value' => (string)$row['Value'],
+        ];
+    }
 }
-$resCounts->free();
 
-// Získáme kapacitu disciplín z nastavení závodu
-$discMax = (int)($match_data['Squad_main_max'] ?? 0);
+foreach ($kategorie as $katId => $kat) {
+    $katCodeRaw = (string)($kat['Name'] ?? '');
+    $katLabel = htmlspecialchars((string)($kat['Value'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $katCode = htmlspecialchars($katCodeRaw, ENT_QUOTES, 'UTF-8');
 
-// Výpis disciplin
-foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
-    $zkratka = htmlspecialchars($zkratky_disciplin[$id] ?? '', ENT_QUOTES, 'UTF-8');
-    $popis = htmlspecialchars($popisy_disciplin[$id] ?? '', ENT_QUOTES, 'UTF-8');
-    $pocet = $counts[$zkratka] ?? 0;
+    // Počet závodníků v kategorii (Disciplina držíme fixně jen kvůli DB)
+    if ($onlyDisciplineCodeRaw !== '') {
+        $stmt = $conn->prepare('SELECT COUNT(*) FROM ' . $table . ' WHERE Disciplina = ? AND Kategorie = ?');
+        $stmt->bind_param('ss', $onlyDisciplineCodeRaw, $katCodeRaw);
+    } else {
+        $stmt = $conn->prepare('SELECT COUNT(*) FROM ' . $table . ' WHERE Kategorie = ?');
+        $stmt->bind_param('s', $katCodeRaw);
+    }
+    $stmt->execute();
+    $stmt->bind_result($pocet);
+    $stmt->fetch();
+    $stmt->close();
 
     echo "<div class='row my-3 mx-1 ms-2 border border-primary bg-white clearfix'>";
-    echo "<div class='caption col h5 py-2 px-2'><span>$nazev_discipliny <small>- $popis</small></span>";
+    echo "<div class='caption col h5 py-2 px-2'><span>kategorie " . $katLabel . " </span>";
 
     // Stav registrace, tlacitko (single registrace)
     $disabledMatchBtn = "<button class='btn btn-outline-dark float-end' disabled>Pozastaveno</button>";
-    $enabledBtn = "<button class='btn btn-primary float-end' data-bs-toggle='collapse' href='#reg_form_$id'>Vybrat</button>";
+    $enabledBtn = "<button class='btn btn-primary float-end' data-bs-toggle='collapse' href='#reg_form_kat_$katId'>Vybrat</button>";
     $disabledBtn = "<button class='btn btn-danger float-end' disabled>Obsazeno</button>";
 
     if ($match_data['Zavod_registrace_pozastaveno'] == 1) {
@@ -41,52 +54,47 @@ foreach ($nazvy_disciplin as $id => $nazev_discipliny) {
         echo ($pocet < $match_data['Squad_main_max']) ? $enabledBtn : $disabledBtn;
     }
 
-    echo "</div>";
+    echo '</div>';
     echo "<div class='col-12 d-block pb-3 text-start'>";
-
-    // Výpis závodníků
-    $stmt = $conn->prepare("SELECT Alias,Prijmeni,Jmeno,Zaplaceno,DatumZaplaceni,ZaplatiNaMiste,DatPay,Staff,Disciplina,Urgence FROM " . $table . " WHERE Disciplina = ? ORDER BY DatReg DESC, Prijmeni");
-    $stmt->bind_param("s", $zkratka);
+    // Výpis závodníků v kategorii
+    if ($onlyDisciplineCodeRaw !== '') {
+        $stmt = $conn->prepare('SELECT Alias,Prijmeni,Jmeno,Zaplaceno,DatumZaplaceni,ZaplatiNaMiste,DatPay,Staff,Disciplina,Urgence FROM ' . $table . ' WHERE Disciplina = ? AND Kategorie = ? ORDER BY DatReg DESC, Prijmeni');
+        $stmt->bind_param('ss', $onlyDisciplineCodeRaw, $katCodeRaw);
+    } else {
+        $stmt = $conn->prepare('SELECT Alias,Prijmeni,Jmeno,Zaplaceno,DatumZaplaceni,ZaplatiNaMiste,DatPay,Staff,Disciplina,Urgence FROM ' . $table . ' WHERE Kategorie = ? ORDER BY DatReg DESC, Prijmeni');
+        $stmt->bind_param('s', $katCodeRaw);
+    }
     $stmt->execute();
     $result_names = $stmt->get_result();
     while ($line = $result_names->fetch_assoc()) {
         $datumZaplatit = new DateTime($line['DatPay']);
-        $datumPaymentWarn = (clone $datumZaplatit)->modify("-5 days");
+        $datumPaymentWarn = (clone $datumZaplatit)->modify('-5 days');
 
         if ($match_data['Payment_before'] == 0) {
-            echo "<span class=text-dark>";
+            echo '<span class=text-dark>';
         } elseif ($line['Zaplaceno'] == 1) {
-            echo "<span class=text-success>";
-        } elseif (($dnes >= $datumPaymentWarn) and $line['Disciplina'] != "VYRAZENO" and $line['Zaplaceno'] == 0 and $line['ZaplatiNaMiste'] == 0) {
-            echo "<span class= text-danger>";
+            echo '<span class=text-success>';
+        } elseif (($dnes >= $datumPaymentWarn) and $line['Disciplina'] != 'VYRAZENO' and $line['Zaplaceno'] == 0 and $line['ZaplatiNaMiste'] == 0) {
+            echo '<span class= text-danger>';
         }
 
-        // definice ikon
-        $serieIcon = "";
-        $roIcon = $pomIcon = $vipIcon = "";
-        if ($line['Staff'] === "RO") {
-            $roIcon = "<i class='far fa-clock' style='font-size:12px'></i>";
-        } elseif ($line['Staff'] === "POM") {
-            $pomIcon = "<i class='far fa-handshake' style='font-size:12px'></i>";
-        } elseif ($line['Staff'] === "VIP") {
-            $vipIcon = "<i class='far fa-crown' style='font-size:12px'></i>";
-        }
-
-        echo "<span class='fw-bold text-nowrap'>" . $serieIcon . $roIcon . $pomIcon . $vipIcon . "&nbsp;" . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "</span>, ";
+        echo "<span class='fw-bold text-nowrap'>" . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . ' ' . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . '</span>, ';
     }
     $stmt->close();
-    echo "</div>";
+    echo '</div>';
 
-    // SINGLE REGISTRACE PRO MĆR K4M
-    echo "<div class='col bg-light m-3 border rounded border-primary'><div id='reg_form_$id' class='collapse'>";
+    // SINGLE REGISTRACE (kategorie)
+    echo "<div class='col bg-light m-3 border rounded border-primary'><div id='reg_form_kat_$katId' class='collapse'>";
     echo "<form class='row my-3 needs-validation' method='post' action='./save.php' novalidate>";
+    echo "<input type='hidden' name='action' value='register_MČR'>";
     echo "<input type='hidden' name='token' value='" . htmlspecialchars($_SESSION['token'] ?? '', ENT_QUOTES, 'UTF-8') . "'>";
     echo "<input type='hidden' name='gender'>";
-    echo "<input type='hidden' name='action' value='register_mcr'>";
-    echo "<input type='hidden' name='Disciplina' value='" . htmlspecialchars($zkratka, ENT_QUOTES, 'UTF-8') . "'>";
-    echo "<input type='hidden' name='datreg' value=" . $dnes->getTimestamp() . ">";
+    echo "<input type='hidden' name='Disciplina' value='" . $onlyDisciplineCode . "'>";
+    echo "<input type='hidden' name='Kategorie' value='" . $katCode . "'>";
+    echo "<input type='hidden' name='Staff' value='PAY'>";
+    echo "<input type='hidden' name='datreg' value=" . $dnes->getTimestamp() . '>';
 
-    $result = $conn->query("SELECT Max(Cislo) FROM " . $table . "");
+    $result = $conn->query('SELECT Max(Cislo) FROM ' . $table . '');
     $line = $result ? $result->fetch_row() : [0];
 
     $tyden = (clone $datumZavod)->format('W');

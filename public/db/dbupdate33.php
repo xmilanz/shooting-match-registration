@@ -17,13 +17,13 @@ if ($check->num_rows == 0) {
         AFTER `Web_zobrazovat_situace`
     ");
     if (!$result) {
-        die(" 2.7: " . $conn->error);
+        die(" 3.3: " . $conn->error);
     }
 }
 /* aktualizace verze databaze */
 $result = $conn->query("
     UPDATE $table_setting
-    SET parValueI='3.3'
+    SET parValue='3.3'
     WHERE parName='dbver'
 ");
 

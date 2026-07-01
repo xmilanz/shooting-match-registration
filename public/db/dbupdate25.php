@@ -23,7 +23,7 @@ if ($check->num_rows == 0) {
 /* aktualizace verze databaze */
 $result = $conn->query("
     UPDATE $table_setting
-    SET parValueI='2.5'
+    SET parValue='2.5'
     WHERE parName='dbver'
 ");
 if (!$result) {

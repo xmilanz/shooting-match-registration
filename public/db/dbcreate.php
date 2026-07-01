@@ -107,12 +107,10 @@ switch ($dbcreateParam) {
     parId int(4)AUTO_INCREMENT PRIMARY KEY,
     parName varchar(20) UNIQUE not null,
     parValue varchar(50),
-    parValueI FLOAT(9,3),
-    parNote1 varchar(100) DEFAULT NULL,
-    parNote2 varchar(100) DEFAULT NULL
+    parNote varchar(100) DEFAULT NULL
     )";
         runQuery($query, "Tabulka [$dbcreateTable] byla vytvořena");
-        $query = "INSERT into $dbcreateTable (parName,parValueI) VALUES ('dbver',2)";
+        $query = "INSERT into $dbcreateTable (parName,parValue) VALUES ('dbver',2)";
         runQuery($query, "Tabulka [$dbcreateTable] byla aktualizována");
         break;
 
@@ -234,6 +232,20 @@ switch ($dbcreateParam) {
         runQuery($query, "Tabulka [$dbcreateTable] byla vytvořena");
         $query = "insert into $dbcreateTable (Name,Value,Description) values
         ('MaO', 'Mala odstrelovacka','Ukazkova disciplina')
+        ";
+        runQuery($query, "Tabulka [$dbcreateTable] byla aktualizována");
+        break;
+
+    case 'categories':
+        $query = 'CREATE TABLE ' . $dbcreateTable . ' (
+    Id int(4)AUTO_INCREMENT PRIMARY KEY,
+    Name varchar(25) UNIQUE not null,
+    Value varchar(100)
+    )';
+        runQuery($query, "Tabulka [$dbcreateTable] byla vytvořena");
+        $query = "insert into $dbcreateTable (Name,Value) values
+        ('REG', 'Regular'),
+        ('JUN', 'Junior')
         ";
         runQuery($query, "Tabulka [$dbcreateTable] byla aktualizována");
         break;

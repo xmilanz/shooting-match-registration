@@ -26,6 +26,8 @@ if ($match_data['Payment_before']) {
    	 Web_zobrazovat_discipliny = ?,
    	 Web_zobrazovat_aliasy = ?,
    	 Web_zobrazovat_vysledky = ?,
+   	 Web_zobrazovat_zavodniky = ?,
+   	 Web_zobrazovat_prehledy = ?,
    	 Zavod_cas_prematch = ?,
    	 Zavod_cas_prezence = ?,
    	 Zavod_cas_main = ?,
@@ -60,7 +62,7 @@ if ($match_data['Payment_before']) {
     WHERE Zavod_id = ?
     ");
     $stmt->bind_param(
-        "sssssssssssissssssssssssssssssssssssssssssssssiiiissiiss",
+        "sssssssssssissssssssiiiiisssssssssssssssssssssssiiiissiiss",
         $_POST['Banka_ucet_cislo'],
         $_POST['Banka_ucet_kod'],
         $_POST['Banka_nazev'],
@@ -85,6 +87,8 @@ if ($match_data['Payment_before']) {
         $_POST['Web_zobrazovat_discipliny'],
         $_POST['Web_zobrazovat_aliasy'],
         $_POST['Web_zobrazovat_vysledky'],
+        $_POST['Web_zobrazovat_zavodniky'],
+        $_POST['Web_zobrazovat_prehledy'],
         $_POST['Zavod_cas_prematch'],
         $_POST['Zavod_cas_prezence'],
         $_POST['Zavod_cas_main'],
@@ -143,6 +147,8 @@ if ($match_data['Payment_before']) {
      Web_zobrazovat_discipliny = ?,
      Web_zobrazovat_aliasy = ?,
      Web_zobrazovat_vysledky = ?,
+   	 Web_zobrazovat_zavodniky = ?,
+   	 Web_zobrazovat_prehledy = ?,
      Zavod_cas_prematch = ?,
      Zavod_cas_prezence = ?,
      Zavod_cas_main = ?,
@@ -177,7 +183,7 @@ if ($match_data['Payment_before']) {
     WHERE Zavod_id = ?
     ");
     $stmt->bind_param(
-        "sssssssssisssssssssssssssssssssssssssssssssssiiissiiss",
+        "sssssssssissssssssssiiiisssssssssssssssssssssssiiissiiss",
         $_POST['Banka_ucet_cislo'],
         $_POST['Banka_ucet_kod'],
         $_POST['Klub_web'],
@@ -200,6 +206,8 @@ if ($match_data['Payment_before']) {
         $_POST['Web_zobrazovat_discipliny'],
         $_POST['Web_zobrazovat_aliasy'],
         $_POST['Web_zobrazovat_vysledky'],
+        $_POST['Web_zobrazovat_zavodniky'],
+        $_POST['Web_zobrazovat_prehledy'],
         $_POST['Zavod_cas_prematch'],
         $_POST['Zavod_cas_prezence'],
         $_POST['Zavod_cas_main'],
