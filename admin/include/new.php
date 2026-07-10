@@ -1,8 +1,3 @@
-<?php
-$paymentBeforeClass = !empty($match_data['Payment_before']) ? '' : 'd-none';
-
-?>
-
 <div class="modal fade" id="new_shooter" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false"
     aria-hidden="true">
     <div class="modal-dialog modal-notify modal-warning" role="document">
@@ -57,9 +52,17 @@ $paymentBeforeClass = !empty($match_data['Payment_before']) ? '' : 'd-none';
                                 </div>
                                 <div class="col-md-4">
                                     <label for="Kategorie" class="form-label mt-3">Kategorie</label>
-                                    <select name="Kategorie" id="Kategorie" class="form-select">
-                                        <option value="Regular">Regular</option>
-                                        <option value="Junior">Junior</option>
+                                    <select class="form-select" name=Kategorie required>
+                                        <option value="" selected>--- vyberte ---</option>
+                                        <?php
+                                        $stmt = $conn->prepare("SELECT * from $table_categories ORDER BY Id");
+                                        $stmt->execute();
+                                        $result_names = $stmt->get_result();
+                                        while ($line = $result_names->fetch_array()) {
+                                            echo "<option value=" . $line['Name'] . ">" . $line['Value'] . "</option>";
+                                        }
+                                        $stmt->close();
+                                        ?>
                                     </select>
                                 </div>
                             </div>

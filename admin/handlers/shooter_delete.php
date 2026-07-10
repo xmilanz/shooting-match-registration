@@ -1,6 +1,7 @@
 <?php
 $line = getShooterData($conn, $table, $_POST['shooterID'], $_POST['shooterKEY']);
 $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
+$nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $line['Kategorie'], "Value");
 
 $stmt = $conn->prepare("
     DELETE FROM $table 

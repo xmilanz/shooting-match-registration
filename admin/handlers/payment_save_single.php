@@ -3,6 +3,9 @@ $dnes = date_format(new DateTime(), "d.m.Y H:i");
 
 $line = getShooterData($conn, $table, $_POST['shooterID'], $_POST['shooterKEY']);
 
+$link_cancel = buildCancelLinks($web_adresa_admin, $_POST['shooterID'], $_POST['shooterKEY']);
+$link_ical = buildCalendarLinks($web_adresa_admin, $match_data);
+
 // ziskame castku za jednu disciplinu
 $FeeStmt = $conn->prepare("SELECT * FROM $table_fee ORDER BY Count");
 $FeeStmt->execute();
@@ -44,8 +47,9 @@ if ($affected == 0) {
     // příprava mailu zavodnikovi
     // nice názvy pro mail
     $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
+    $nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $line['Kategorie'], "Value");
 
-    $STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " \r\n";
+    $STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "[$link_cancel] [$link_ical]\r\n";
     $STRELEC .= "Kategorie: " . htmlspecialchars($line['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n";
     $STRELEC .= "Discpilína: $nazev_discipliny" . "\r\n";
 

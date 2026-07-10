@@ -76,7 +76,7 @@ $FeeStmt->execute();
 $feeValues = $FeeStmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $FeeStmt->close();
 
-$STRELEC = "Závodník " . htmlspecialchars($rows[0]['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($rows[0]['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
+$STRELEC = "Závodník " . htmlspecialchars($rows[0]['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($rows[0]['Prijmeni'], ENT_QUOTES, 'UTF-8') . "[$link_ical]\r\n";
 $STRELEC .= "Kategorie: " . htmlspecialchars($rows[0]['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n\r\n";
 $STRELEC .= "Disciplíny:\r\n";
 foreach ($cisla_disc_odkazy as $i => $r) {

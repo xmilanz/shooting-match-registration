@@ -27,12 +27,12 @@ function renderCompetitorsSection(
 ?>
     <?php
     // Dotaz pro získání závodníků
-    if ($match_data['Payment_before']) {
+    if ($match_data['Payment_before'] == 1) {
         $stmt = $conn->prepare("
             SELECT 
         Cislo,
         Stav,
-        CASE WHEN Prijmeni LIKE '% %' THEN CONCAT(SUBSTRING_INDEX(Prijmeni, ' ', 1), ' ', Jmeno, ' ', SUBSTRING_INDEX(Prijmeni, ' ', -1)) ELSE CONCAT(Prijmeni, ' ', Jmeno) END AS PrijmeniJmeno,
+        CASE WHEN Prijmeni LIKE '% %' THEN CONCAT(SUBSTRING_INDEX(Prijmeni, ' ', 1), ' ', Jmeno, ' ', SUBSTRING_INDEX(Prijmeni, ' ', -1)) ELSE CONCAT(Prijmeni, ' ', Jmeno) END AS `Příjmení Jméno`,
         TRIM(CONCAT(ObcanskyPrukaz,' ',IF(ZbrojniOpravneni = 1, '(zo)', ''))) AS `Občanský průkaz`,
         CisloZbrane,
         Kategorie,
@@ -64,7 +64,7 @@ function renderCompetitorsSection(
             SELECT 
         Cislo,
         Stav,
-        CONCAT (Prijmeni, ' ', Jmeno) AS 'Příjmení Jméno',
+        CASE WHEN Prijmeni LIKE '% %' THEN CONCAT(SUBSTRING_INDEX(Prijmeni, ' ', 1), ' ', Jmeno, ' ', SUBSTRING_INDEX(Prijmeni, ' ', -1)) ELSE CONCAT(Prijmeni, ' ', Jmeno) END AS `Příjmení Jméno`,
         TRIM(CONCAT(ObcanskyPrukaz,' ',IF(ZbrojniOpravneni = 1, '(zo)', ''))) AS `Občanský průkaz`,
         CisloZbrane,
         Kategorie,
@@ -100,8 +100,8 @@ function renderCompetitorsSection(
         if ($col->name === 'VS') {
             $fields[] = 'VS';
             $fields[] = 'Statut';
-            if ($match_data['Payment_before']) {
-                $fields[] = 'Platba';
+            if ($match_data['Payment_before'] == 1) {
+                $fields[] = 'Stav registrace';
             }
             $fields[] = 'Funkce';
         }
@@ -152,7 +152,7 @@ function renderCompetitorsSection(
         $stavText = "čeká na platbu";
         $stavClass = "bg-secondary";
 
-        if (($line['Disciplina'] ?? '') == "VYRAZENO") {
+        if (($line['Disciplina'] ?? '') == "VYRAZENO" && $line['Staff'] == "DNS") {
             $stavText = "";
             $stavClass = "";
             $lineClass = "zavodnik-vyrazeno";
@@ -163,7 +163,7 @@ function renderCompetitorsSection(
             $stavClass = "bg-info";
             $lineClass = "zavodnik-namiste";
         }
-        if (($line['Staff'] ?? '') !== "PAY") {
+        if (($line['Staff'] ?? '') !== "PAY" && $line['Staff'] != "DNS") {
             $stavText = "neplatí";
             $stavClass = "bg-success";
         }
@@ -175,10 +175,10 @@ function renderCompetitorsSection(
         if (!empty($line['Urgence']) && (int)($line['Zaplaceno'] ?? 0) === 0) {
             $stavText = "urgence platby";
             $stavClass = "bg-danger";
-            //$lineClass = "zavodnik-urgence";
+            $lineClass = "zavodnik-urgence";
         }
         if (
-            ($match_data['Payment_before'])
+            ($match_data['Payment_before'] == 1)
             && (($line['Disciplina'] ?? '') != "VYRAZENO")
             && (($line['Staff'] ?? '') == "PAY")
             && ((int)($line['Zaplaceno'] ?? 0) === 0)
@@ -224,8 +224,8 @@ function renderCompetitorsSection(
                     echo "<td class='Statut'><span class='badge p-2 $staffClass'>$staffText</span></td>";
                     break;
 
-                case 'Platba':
-                    echo "<td class='Platba'><span class='badge p-2 $stavClass'>$stavText</span></td>";
+                case 'Stav registrace':
+                    echo "<td class='stavRegistrace'><span class='badge p-2 $stavClass'>$stavText</span></td>";
                     break;
 
                 case 'Funkce':
@@ -436,6 +436,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'competitors') {
         exit;
     }
     $match_data = (array)$result->fetch_array();
+
+//$paymentBefore = $match_data['Payment_before'];
+//$registraceSmeny = $match_data['Zavod_registrace_smeny'];
+
 
     $paymentBeforeClass = (($match_data['Payment_before'] ?? 0) == 1) ? '' : 'd-none';
     $hromadnaRegistraceClass = (($match_data['Zavod_registrace_hromadna'] ?? 0) == 1) ? '' : 'd-none';
@@ -655,8 +659,6 @@ include_once("./include/truncate_table.php");
         $('#refresh-competitors').on('click', refreshCompetitors);
     });
 </script>
-
-
 
 </BODY>
 

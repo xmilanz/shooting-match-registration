@@ -26,7 +26,7 @@ if ($result && $result->num_rows > 0) {
 
     $staffLabels = [
         "PAY" => "platící závodník",
-        "DNS" => "vyřazen",
+        "DNS" => "vyřazen", // Do Not Shoot :-)
         "RO" => "rozhodčí - neplatí",
         "POM" => "pomocník - neplatí",
         "VIP" => "VIP - neplatí"
@@ -34,6 +34,7 @@ if ($result && $result->num_rows > 0) {
     $staffLabel = $staffLabels[$line['Staff']] ?? htmlspecialchars($line['Staff'], ENT_QUOTES, 'UTF-8');
 
     $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
+    $nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $line['Kategorie'], "Value");
 ?>
     <INPUT type="hidden" id="shooterID" name="shooterID" value="<?= htmlspecialchars($ID, ENT_QUOTES, 'UTF-8') ?>" required>
     <INPUT type="hidden" id="Zaplaceno" name="Zaplaceno"
@@ -77,9 +78,16 @@ if ($result && $result->num_rows > 0) {
                             <label class='form-label pt-1'>Kategorie</label>
                             <select <?= disabled($_SESSION['role'] === 'viewer'); ?> class="form-select" name=Kategorie>
                                 <option value="<?= htmlspecialchars($line['Kategorie'], ENT_QUOTES, 'UTF-8') ?>">
-                                    <?= htmlspecialchars($line['Kategorie'], ENT_QUOTES, 'UTF-8') ?></option>
-                                <option value="Regular">Regular</option>
-                                <option value="Junior">Junior</option>
+                                    <?= $nazev_kategorie ?></option>
+                                <?php
+                                $stmt = $conn->prepare("SELECT * from $table_categories ORDER BY Id");
+                                $stmt->execute();
+                                $result_names = $stmt->get_result();
+                                while ($kat = $result_names->fetch_array()) {
+                                    echo "<option value=" . $kat['Name'] . ">" . $kat['Value'] . "</option>";
+                                }
+                                $stmt->close();
+                                ?>
                             </select>
                         </div>
                     </div>

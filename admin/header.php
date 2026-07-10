@@ -38,13 +38,11 @@ require_once __DIR__ . '/config/mail_texty.php';
 $paymentBeforeClass = ($match_data['Payment_before'] == 1) ? '' : 'd-none';
 $hromadnaRegistraceClass = ($match_data['Zavod_registrace_hromadna'] == 1) ? '' : 'd-none';
 $smenyRegistraceClass = ($match_data['Zavod_registrace_smeny'] == 1) ? "" : "d-none";
+$registracePozastavena = ($match_data['Zavod_registrace_pozastaveno'] == 1) ? '' : 'd-none';
 
 $poradatel = getPoradatelFromMatch($match_data);
 $organizer = $_SESSION['organizer'] ?? '';
 $availableRaces = getRacesForOrganizer($conn, $organizer, $zavody_prefix);
-
-$registracePozastavena = ($match_data['Zavod_registrace_pozastaveno'] == 1) ? '' : 'd-none';
-
 
 $dnes = (new DateTime())->format("Y-m-d H:i:s");
 ?>

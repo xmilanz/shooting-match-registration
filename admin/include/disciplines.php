@@ -4,14 +4,14 @@
         <div class="modal-content">
             <div class="modal-header bg-success text-center">
                 <h4 class="modal-title text-white w-100 fw-bold">Správa
-                    disciplín<span class="<?= $smenyRegistraceClass ?>"><?= empty($match_data['Pocet_smen']) ? '' : " (počet směn $match_data[Pocet_smen])" ?></span>
+                    disciplín<span class="<?= hidden($match_data['Zavod_registrace_smeny'] == 1); ?>"><?= empty($match_data['Pocet_smen']) ? '' : " (počet směn $match_data[Pocet_smen])" ?></span>
                 </h4>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="col-md-12">
-                    <div class="<?= $smenyRegistraceClass ?> alert alert-info small mt-0" role="alert">
+                    <div class="<?= hidden($match_data['Zavod_registrace_smeny'] == 1); ?> alert alert-info small mt-0" role="alert">
                         Při registraci do směn slouží pole <strong>Směna (od)</strong> a <strong>Směna (do)</strong> k
                         vymezení směn, ve kterých se budou střílet jednotlivé disciplíny. U ostatních způsobů registrace
                         (hromadná nebo jednotlivá) ponechte pole prázdná.<br><br>
@@ -28,8 +28,8 @@
                                 <th style="width:100px; vertical-align:top;">Zkratka</th>
                                 <th style="width:150px; vertical-align:top;">Název</th>
                                 <th style="vertical-align:top;">Popis</th>
-                                <th class="<?= $smenyRegistraceClass ?>" style="width:60px; vertical-align:top; text-align:center;">Směna<br>(od)</th>
-                                <th class="<?= $smenyRegistraceClass ?>" style="width:60px; vertical-align:top; text-align:center;">Směna<br>(do)</th>
+                                <th class="<?= hidden($match_data['Zavod_registrace_smeny'] == 1); ?>" style="width:60px; vertical-align:top; text-align:center;">Směna<br>(od)</th>
+                                <th class="<?= hidden($match_data['Zavod_registrace_smeny'] == 1); ?>" style="width:60px; vertical-align:top; text-align:center;">Směna<br>(do)</th>
                                 <th style="width:100px; vertical-align:top" colspan="3" class="text-center">Akce</th>
                             </tr>
                         </thead>
@@ -56,12 +56,12 @@
                                         data-field="Description"
                                         data-id="<?= $line['Id'] ?>"><?= htmlspecialchars($line['Description']) ?>
                                     </td>
-                                    <td class="<?= $smenyRegistraceClass ?> editable text-center"
+                                    <td class="<?= hidden($match_data['Zavod_registrace_smeny'] == 1); ?> editable text-center"
                                         data-table="<?= $table_disciplines ?>"
                                         data-field="Shift_from"
                                         data-id="<?= $line['Id'] ?>"><?= htmlspecialchars($line['Shift_from']) ?>
                                     </td>
-                                    <td class="<?= $smenyRegistraceClass ?> editable text-center"
+                                    <td class="<?= hidden($match_data['Zavod_registrace_smeny'] == 1); ?> editable text-center"
                                         data-table="<?= $table_disciplines ?>"
                                         data-field="Shift_to"
                                         data-id="<?= $line['Id'] ?>"><?= htmlspecialchars($line['Shift_to']) ?>
@@ -87,8 +87,8 @@
                                     <td><input class="form-control" type="text" name="Name" id="Name" onkeypress="return avoidspace(event)" required></td>
                                     <td><input class="form-control" type="text" name="Value" id="Value" required></td>
                                     <td><input class="form-control" type="text" name="Description" id="Description"></td>
-                                    <td class="<?= $smenyRegistraceClass ?>"><input class="form-control" type="text" name="Shift_from" id="Shift_from"></td>
-                                    <td class="<?= $smenyRegistraceClass ?>"><input class="form-control" type="text" name="Shift_to" id="Shift_to"></td>
+                                    <td class="<?= hidden($match_data['Zavod_registrace_smeny'] == 1); ?>"><input class="form-control" type="text" name="Shift_from" id="Shift_from"></td>
+                                    <td class="<?= hidden($match_data['Zavod_registrace_smeny'] == 1); ?>"><input class="form-control" type="text" name="Shift_to" id="Shift_to"></td>
                                     <td class="text-center"><button type="submit" class="btn btn-sm btn-primary px-4 py-2"><i class="bi bi-plus-circle me-1"></i>Přidat</button></td>
                                 </tr>
                             </form>

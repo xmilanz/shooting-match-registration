@@ -37,7 +37,7 @@ foreach ($rows as $i => $row) {
     $poznamka  = $row['Poznamka'];
     $nazev = getValueFromTable($conn, $table_disciplines, "Name", $disc, "Value");
 
-    $link = "<a href='" . htmlspecialchars($web_adresa_admin, ENT_QUOTES, 'UTF-8') . "/zrus_ucast.php?id=" . rawurlencode($cislo) . "&klic=" . rawurlencode($klic) . "'>Zrušit účast</a>";
+    $link = "<a href='" . htmlspecialchars($web_adresa_admin, ENT_QUOTES, 'UTF-8') . "/zrus_ucast.php?id=" . rawurlencode($cislo) . "&klic=" . rawurlencode($klic) . "'>zrušit účast</a>";
 
     $cisla_disc_odkazy[] = [
         'cislo' => $cislo,
@@ -53,12 +53,14 @@ $datumRegistraceZavodnika = new DateTime();
 $datumRegistraceZavodnika->setTimestamp($rows[0]['DatReg'])->format('d.m.Y');
 $isVIP = in_array($rows[0]['Staff'], ['VIP', 'RO', 'POM']);
 
+// nice názvy pro mail
+$nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $row['Kategorie'], "Value");
+$link_ical = buildCalendarLinks($web_adresa_admin, $match_data);
 
-$STRELEC = "Závodník: " . htmlspecialchars($rows[0]['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($rows[0]['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
-$STRELEC .= "Kategorie: " . htmlspecialchars($row['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n\r\n";
+$STRELEC = "Závodník: " . htmlspecialchars($rows[0]['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($rows[0]['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_ical] " . "\r\n";
+$STRELEC .= "Kategorie: $nazev_kategorie \r\n\r\n";
 $STRELEC .= "Disciplíny:\r\n";
 foreach ($cisla_disc_odkazy as $i => $r) {
-    //        if (($staff == "RO") or ($staff == "POM")) { 
     if ($isVIP) {
         $castka = 0;
     } elseif ($i === 0) {

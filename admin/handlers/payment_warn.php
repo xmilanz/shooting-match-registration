@@ -4,8 +4,8 @@ $line = getShooterData($conn, $table, $_POST['shooterID'], $_POST['shooterKEY'])
 $squad = $line['Squad'];
 $varsymbol = $line['VarSym'];
 
-$link_cancel = buildCancelLinks($reg_url, $cislo, $klic);
-$link_ical = buildCalendarLinks($reg_url, $match_data);
+$link_cancel = buildCancelLinks($web_adresa_admin, $_POST['shooterID'], $_POST['shooterKEY']);
+$link_ical = buildCalendarLinks($web_adresa_admin, $match_data);
 
 $line['Staff'] == "RO" ? $Rozhodci = "ANO" : $Rozhodci = "NE";
 $line['Staff'] == "POM" ? $Pomocnik = "ANO" : $Pomocnik = "NE";

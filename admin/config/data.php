@@ -12,21 +12,41 @@ $table_admins = "";
 $reg_redirect_url = "";
 
 // podmínky pro sdílené tabulky určitého druhu závodu - příklady
-if (strpos($table, 'k4m') !== false) {
+$table_categories = "ssas_categories";
+
+if (strpos($table, 'tenolix') !== false) {
+    $table_disciplines = "ssas_k4m_disciplines";
+    $table_categories = "ssas_k4m_tenolix_categories";
+    $table_fee = "ssas_k4m_tenolix_fee";
+    $druh_souteze = "Malorážkový závod na myslivecké terče (liška, srnec, kamzík, prase), tzv. velký standard";
+}
+elseif (strpos($table, 'mcr') !== false) {
+    $table_disciplines = "ssas_k4m_disciplines";
+    $table_categories = "ssas_k4m_mcr_categories";
+    $table_fee = "ssas_k4m_mcr_fee";
+    $druh_souteze = "Malorážkový závod na myslivecké terče (liška, srnec, kamzík, prase), tzv. velký standard";
+}
+elseif (strpos($table, 'k4m') !== false) {
     $table_disciplines = "ssas_k4m_disciplines";
     $table_categories = "ssas_k4m_categories";
     $table_fee = "ssas_k4m_fee";
+    $druh_souteze = "Malorážkový závod na myslivecké terče (liška, srnec, kamzík, prase), tzv. velký standard";
+}
+elseif (strpos($table, 'manevry') !== false) {
+    $table_disciplines = "ssas_manevry_disciplines";
+    $table_fee = "ssas_manevry_fee";
+    $druh_souteze = "Soutěž jednotlivců ve střelbě z velkorážné pušky, karabiny na pistolové náboje, malorážky a velké i malorážné pistole nebo revolveru";
 }
 elseif (strpos($table, 'odstrelovacka') !== false) {
     $table_disciplines = "ssas_odstrelovacka_disciplines";
     $table_fee = "ssas_odstrelovacka_fee";
+    $druh_souteze = "Závod ve střelbě z malorážných, vzduchových a velkorážných pušek s optikou na vzdálenost 50 m";
 }
 else {
     $table_disciplines=$table."_disciplines";
     $table_fee=$table."_fee";
+    $druh_souteze ="stručný popis soutěže";
 }
-
-$table_categories = "ssas_categories";
 
 $admin_roles = array(
     "admin" => "přístup ke všem funkcím registračního systému",

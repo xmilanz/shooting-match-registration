@@ -176,9 +176,10 @@ if ($isVIP) {
 // priprava podkladu pro e-mail zavodnikovi
 // nice názvy pro mail
 $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
+$nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $line['Kategorie'], "Value");
 
 $STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel] [$link_ical]\r\n";
-$STRELEC .= "Kategorie: $kategorie" . "\r\n";
+$STRELEC .= "Kategorie: $nazev_kategorie" . "\r\n";
 $STRELEC .= "Discpilína: $nazev_discipliny" . "\r\n\r\n";
 $STRELEC .= "<i>Rozhodčí: $Rozhodci" . "\r\n";
 $STRELEC .= "Pomocník: $Pomocnik</i>" . "\r\n";
@@ -220,7 +221,7 @@ if (!$send_email) {
     $stmt = $conn->prepare("
 		UPDATE $table 
 		SET OdeslanRegMail = 1
-		WHERE Mail = ? AND OdeslanRegMail = 0
+		WHERE Mail = ? AND OdeslanRegMail IS NULL
 	        ");
     $stmt->bind_param(
         "s",

@@ -4,6 +4,7 @@ $field = $_POST['field'];
 $id = intval($_POST['id']);
 $value = $_POST['value'];
 
+//$table_disciplines = 'dev_ssas_match_disciplines'; // TO-DO zjsitit proč je to tady
 $allowedTables = [
     $table_admins => ['username', 'email', 'role', 'firstname', 'lastname', 'organizer', 'password', 'force_password_change'],
     $table_disciplines => ['Name', 'Value', 'Description', 'Shift_from', 'Shift_to'],

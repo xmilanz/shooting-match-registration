@@ -115,9 +115,10 @@ if ($affected == 0) {
     // příprava mailu zavodnikovi
     // nice názvy pro mail
     $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
+    $nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $line['Kategorie'], "Value");
 
     $STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
-    $STRELEC .= "Kategorie: " . htmlspecialchars($line['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n";
+    $STRELEC .= "Kategorie: $nazev_kategorie" . "\r\n";
     $STRELEC .= "Disciplína: $nazev_discipliny" . "\r\n";
 
     $from_text = htmlspecialchars($match_data['Zavod_poradatel'], ENT_QUOTES, 'UTF-8');
