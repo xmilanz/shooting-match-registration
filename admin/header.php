@@ -40,7 +40,6 @@ $hromadnaRegistraceClass = ($match_data['Zavod_registrace_hromadna'] == 1) ? '' 
 $smenyRegistraceClass = ($match_data['Zavod_registrace_smeny'] == 1) ? "" : "d-none";
 $registracePozastavena = ($match_data['Zavod_registrace_pozastaveno'] == 1) ? '' : 'd-none';
 
-$poradatel = getPoradatelFromMatch($match_data);
 $organizer = $_SESSION['organizer'] ?? '';
 $availableRaces = getRacesForOrganizer($conn, $organizer, $zavody_prefix);
 
@@ -103,7 +102,6 @@ $dnes = (new DateTime())->format("Y-m-d H:i:s");
                 <div class="logo-right"></div>
             </div>
         </div>
-
         <nav class="navbar navbar-expand-lg navbar-fixed-top bg-dark">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
                 <span class="navbar-toggler-icon"></span>
@@ -164,18 +162,17 @@ $dnes = (new DateTime())->format("Y-m-d H:i:s");
                                 <a class="dropdown-item" href="" data-bs-toggle="modal"
                                     data-bs-target="#manage_fee">Startovné</a>
                             </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <button class="btn btn-dark dropdown-toggle mx-3" id="dropdownButton1" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            Export
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li class="<?= (strpos(normalize($match_data['Zavod']), 'tenolix')) ? "d-none" : ""; ?>"><a class="dropdown-item" href="export_prezence.php">Seznam pro prezenci</a></li>
-                            <li class="<?= (strpos(normalize($match_data['Zavod']), 'tenolix')) ? "" : "d-none"; ?>"><a class="dropdown-item" href="export_prezence_tenolix.php">Seznam pro prezenci</a></li>
-                        </ul>
-                    </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <button class="btn btn-dark dropdown-toggle mx-3" id="dropdownButton1" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                Export
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="export_prezence<?= (stripos(normalize($match_data['Zavod']), 'tenolix') !== false) ? "_tenolix" : ""; ?>.php">Seznam pro prezenci</a></li>
+                            </ul>
+                        </li>
                 </ul>
                 <div class="userArea dropdown me-2">
                     <button class="btn btn-dark custom" type="button" id="userDropdown" data-bs-toggle="dropdown"

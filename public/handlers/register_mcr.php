@@ -11,6 +11,7 @@ $mesto = trim($_POST['Mesto'] ?? '');
 $psc = trim($_POST['PSC'] ?? '');
 $cz = normalizePrukaz(trim($_POST['CZ']) ?? '');
 $nz = normalizeText($_POST['NZ'] ?? '');
+$isVIP = in_array($_POST['Staff'], ['RO', 'POM']);
 
 $poznamka = trim($_POST['Poznamka'] ?? '');
 $staff = $_POST['Staff'] ?? '';
@@ -24,6 +25,15 @@ $FeeStmt = $conn->prepare("SELECT * FROM $table_fee ORDER BY Count");
 $FeeStmt->execute();
 $feeValues = $FeeStmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $FeeStmt->close();
+
+// VIP neplatí, junioři 50%
+if ($isVIP) {
+    $CastkaZaplatit = 0;
+} elseif ($kategorie == 'JUN') {
+    $CastkaZaplatit = $feeValues[0]['Value']/2;
+} else {
+    $CastkaZaplatit = $feeValues[0]['Value'];
+}
 
 $stmt = $conn->prepare("
 		INSERT INTO $table 
@@ -50,7 +60,7 @@ $stmt->bind_param(
     $_POST['Disciplina'],
     $staff,
     $klic,
-    $feeValues[0]['Value'],
+    $CastkaZaplatit,
     $poznamka,
     $table
 );
@@ -91,7 +101,6 @@ $stmt->close();
 
 $staff == "RO" ? $Rozhodci = "ANO" : $Rozhodci = "NE";
 $staff == "POM" ? $Pomocnik = "ANO" : $Pomocnik = "NE";
-$isVIP = in_array($line['Staff'], ['RO', 'POM']);
 
 // Uprava terminu zaplaceni závodníka, co se zaregistruje mene nez Zavod_pocet_dni_na_platbu dni pred prematchem
 $datumZavod = new DateTime($match_data['Zavod_datum']);
@@ -124,19 +133,14 @@ $stmt->execute();
 $stmt->close();
 
 $varsymbol = $varsymbol_new;
-$CastkaZaplatit = ($isVIP) ? '0'  : number_format($feeValues[0]['Value'], 2, ',', ' ');
 
 // nice nazev pro mail
-$nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
+$nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $line['Kategorie'], "Value");
 
 $STRELEC_SHOOTER = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
-$STRELEC_KATEGORIE = "Kategorie: $kategorie" . "\r\n";
-$STRELEC_DISCIPLINA = "Disciplína: $nazev_discipliny \r\n";
-$STRELEC_RO = "Rozhodčí: $Rozhodci";
-$STRELEC_POM = "Pomocník: $Pomocnik";
-$STRELEC_CASTKA = "Částka: $CastkaZaplatit  " . $match_data['Banka_ucet_MENA'] . "";
+$STRELEC_KATEGORIE = "Kategorie: $nazev_kategorie" . "\r\n";
+$STRELEC_CASTKA = "Částka: ". number_format($CastkaZaplatit, 2, ',', ' ') ." " . $match_data['Banka_ucet_MENA'] . "";
 
-//$link_cancel = "<a href='" . htmlspecialchars($reg_url, ENT_QUOTES, 'UTF-8') . "/zrus_ucast.php?id=" . rawurlencode($cislo) . "&klic=" . rawurlencode($line['klic']) . "'><strong>zrušit účast</strong></a>";
 $link_cancel = buildCancelLinks($reg_url, $cislo, $klic);
 $link_ical = buildCalendarLinks($reg_url, $match_data);
 
@@ -148,10 +152,7 @@ WarningModal(
 		<div class='font-monospace d-inline-block text-start mt-2'>
 		    $STRELEC_SHOOTER<br>
             $STRELEC_KATEGORIE<br>
-		    $STRELEC_DISCIPLINA<br>
-            $STRELEC_CASTKA<br>
-            $STRELEC_RO<br>
-            $STRELEC_POM
+            $STRELEC_CASTKA
 		</div>
 		",
     "Potvrzení registrace bylo odesláno na adresu $email",
@@ -162,16 +163,13 @@ WarningModal(
 
 // posilame mail zavodnikovi
 $STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel] [$link_ical] " . "\r\n";
-$STRELEC .= "Kategorie: $kategorie" . "\r\n";
-$STRELEC .= "Disciplina: $nazev_discipliny" . "\r\n\r\n";
-$STRELEC .= "<i>Rozhodčí: $Rozhodci" . "\r\n";
-$STRELEC .= "Pomocník: $Pomocnik</i>" . "\r\n\r\n";
+$STRELEC .= "Kategorie: $nazev_kategorie" . "\r\n";
 $STRELEC .= "Poznámka: $poznamka</i>" . "\r\n";
 
 $qrParams = [
     'accountNumber' => $match_data['Banka_ucet_cislo'],
     'bankCode'      => $match_data['Banka_ucet_kod'],
-    'amount'        => $feeValues[0]['Value'],
+    'amount'        => $CastkaZaplatit,
     'currency'      => $match_data['Banka_ucet_MENA'],
     'vs'            => $varsymbol,
     'message'       => $match_data['Zavod'],
@@ -214,7 +212,7 @@ if ($isVIP) {
 
 $message = str_replace("##STRELEC##", $STRELEC, $message);
 $message = str_replace("##VAR_SYMBOL##", $varsymbol, $message);
-$message = str_replace("##CASTKA##", number_format($feeValues[0]['Value'], 2, ',', ' '), $message);
+$message = str_replace("##CASTKA##", number_format($CastkaZaplatit, 2, ',', ' '), $message);
 $message = str_replace("##QR_LINK##", $qr_link, $message);
 $message = str_replace("##DatPay##", $paymentDeadline, $message);
 
@@ -245,4 +243,3 @@ if (!$send_email) {
     $stmt->close();
 }
 include "./footer.php";
-?>

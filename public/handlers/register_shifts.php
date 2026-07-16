@@ -137,19 +137,19 @@ $stmt->execute();
 $stmt->close();
 
 $varsymbol = $varsymbol_new;
-$CastkaZaplatit = ($isVIP) ? '0'  : $CastkaZaplatit;
+//$CastkaZaplatit = ($isVIP) ? '0'  : $CastkaZaplatit;
 
 // nice nazev pro mail
 $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
+$nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $line['Kategorie'], "Value");
 
 $STRELEC_SHOOTER = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
-$STRELEC_KATEGORIE = "Kategorie: $kategorie" . "\r\n";
+$STRELEC_KATEGORIE = "Kategorie: $nazev_kategorie" . "\r\n";
 $STRELEC_DISCIPLINA = "Disciplína: $nazev_discipliny \r\n";
 $STRELEC_RO = "Rozhodčí: $Rozhodci";
 $STRELEC_POM = "Pomocník: $Pomocnik";
 $STRELEC_CASTKA = "Částka: $CastkaZaplatit  " . $match_data['Banka_ucet_MENA'] . "";
 
-//$link_cancel = "<a href='" . htmlspecialchars($reg_url, ENT_QUOTES, 'UTF-8') . "/zrus_ucast.php?id=" . rawurlencode($cislo) . "&klic=" . rawurlencode($line['klic']) . "'><strong>zrušit účast</strong></a>";
 $link_cancel = buildCancelLinks($reg_url, $cislo, $klic);
 $link_ical = buildCalendarLinks($reg_url, $match_data);
 
@@ -175,7 +175,7 @@ WarningModal(
 
 // posilame mail zavodnikovi
 $STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel] [$link_ical] " . "\r\n";
-$STRELEC .= "Kategorie: $kategorie" . "\r\n";
+$STRELEC .= "Kategorie: $nazev_kategorie" . "\r\n";
 $STRELEC .= "Disciplina: $nazev_discipliny" . "\r\n\r\n";
 $STRELEC .= "<i>Rozhodčí: $Rozhodci" . "\r\n";
 $STRELEC .= "Pomocník: $Pomocnik</i>" . "\r\n\r\n";

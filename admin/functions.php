@@ -342,23 +342,6 @@ function isValidPassword($password, $username = '', &$errorMessage = '')
     return true;
 }
 
-
-function getPoradatelFromMatch(array $match_data): string {
-    if (empty($match_data['Zavod_poradatel'])) {
-        return '';
-    }
-    $normalized = normalize($match_data['Zavod_poradatel']);
-    if (strpos($normalized, 'prachatice') !== false) {
-        return 'prachatice';
-    }
-    if (strpos($normalized, 'pelhrimov') !== false) {
-        return 'pelhrimov';
-    }
-    // další pravidla...
-    return $normalized;
-}
-
-
 function getRacesForOrganizer(mysqli $conn, string $organizer, array $zavody_prefix): array
 {
     global $table_matches;

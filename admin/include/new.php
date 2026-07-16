@@ -53,7 +53,7 @@
                                 <div class="col-md-4">
                                     <label for="Kategorie" class="form-label mt-3">Kategorie</label>
                                     <select class="form-select" name=Kategorie required>
-                                        <option value="" selected>--- vyberte ---</option>
+                                        <option value="REG" selected>Regular</option>
                                         <?php
                                         $stmt = $conn->prepare("SELECT * from $table_categories ORDER BY Id");
                                         $stmt->execute();

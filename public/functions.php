@@ -149,6 +149,23 @@ function getShooterData(mysqli $conn, string $table, int $shooterID, int $shoote
     return $data ?: null;
 }
 
+function getPoradatel(array $match_data): string {
+    if (empty($match_data['Zavod_poradatel'])) {
+        return '';
+    }
+    $normalized = normalize($match_data['Zavod_poradatel']);
+    if (strpos($normalized, 'prachatice') !== false) {
+        return 'prachatice';
+    }
+    if (strpos($normalized, 'pelhrimov') !== false) {
+        return 'pelhrimov';
+    }
+    // další pravidla...
+    return $normalized;
+}
+
+
+
 function ensureTable(mysqli $conn, string $name, string $paramKey, string $paramTable = ''): void
 {
     global $table; // přístup k $table z data.php

@@ -469,7 +469,7 @@ include __DIR__ . '/header.php';
             <?= renderCompetitorsSection($conn, (string)$table, (array)$match_data, (string)$dnes, (string)$paymentBeforeClass, (string)$hromadnaRegistraceClass) ?>
         </div>
     </div>
-    <div class="footer">SSAŠ střelnice Prachatice &copy; Milan Žídek <?= date("Y") ?><span style="float:right">Shooting match registration system 3.9</span></div>
+    <div class="footer">SSAŠ střelnice Prachatice &copy; Milan Žídek <?= date("Y") ?><span style="float:right">Shooting match registration system 3.9.1</span></div>
 </div>
 <?php
 include_once("./include/match_config.php");

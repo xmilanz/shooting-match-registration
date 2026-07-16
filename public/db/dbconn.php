@@ -19,18 +19,18 @@ $conn->set_charset('utf8mb4');
 ensureTable($conn, $table_setting, 'setting', $table . '_setting');
 ensureTable($conn, $table, 'main', $table);
 ensureTable($conn, $table_matches, 'match_config', $table_matches);
-ensureTable($conn, $table_disciplines, 'disciplines', $table . '_disciplines');
-ensureTable($conn, $table_disciplines, 'categories', $table . '_categories');
-ensureTable($conn, $table_fee, 'fee', $table . '_fee');
+ensureTable($conn, $table_disciplines, 'disciplines', $table_disciplines);
+ensureTable($conn, $table_disciplines, 'categories', $table_categories);
+ensureTable($conn, $table_fee, 'fee', $table_fee);
 ensureTable($conn, $table_admins, 'site_admins', $table_admins);
 
 $installed =
     ensureTable($conn, $table_setting,     'setting',     $table . '_setting') |
     ensureTable($conn, $table,             'main',        $table) |
     ensureTable($conn, $table_matches,     'match_config',$table_matches) |
-    ensureTable($conn, $table_disciplines, 'disciplines', $table . '_disciplines') |
-    ensureTable($conn, $table_disciplines, 'categories', $table . '_categories') |
-    ensureTable($conn, $table_fee,         'fee',         $table . '_fee') |
+    ensureTable($conn, $table_disciplines, 'disciplines', $table_disciplines) |
+    ensureTable($conn, $table_disciplines, 'categories', $table_categories) |
+    ensureTable($conn, $table_fee,         'fee',         $table_fee) |
     ensureTable($conn, $table_admins,      'site_admins', $table_admins);
 
 if ($installed) {

@@ -23,19 +23,12 @@ if ($datumRegistraceZavodnika >= $datumPrematch->modify("-$match_data[Zavod_poce
     $paymentDeadline = (clone $datumRegistraceZavodnika)->modify("+$match_data[Zavod_pocet_dni_na_platbu] days")->format('d.m.Y');
 }
 
-// priprava podkladu pro e-mail zavodnikovi
-// ziskame castku za jednu disciplinu
-$FeeStmt = $conn->prepare("SELECT * FROM $table_fee ORDER BY Count");
-$FeeStmt->execute();
-$feeValues = $FeeStmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$FeeStmt->close();
-
 // nice názvy pro mail
 $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
-// nice názvy pro mail
+$nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $line['Kategorie'], "Value");
 
 $STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . " [$link_cancel] [$link_ical]\r\n";
-$STRELEC .= "Kategorie: " . htmlspecialchars($line['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n";
+$STRELEC .= "Kategorie: $nazev_kategorie" . "\r\n";
 $STRELEC .= "Disciplína: $nazev_discipliny" . "\r\n\r\n";
 $STRELEC .= "<i>Rozhodčí: $Rozhodci" . "\r\n";
 $STRELEC .= "Pomocník: $Pomocnik</i>" . "\r\n";
@@ -43,7 +36,7 @@ $STRELEC .= "Pomocník: $Pomocnik</i>" . "\r\n";
 $qrParams = [
     'accountNumber' => $match_data['Banka_ucet_cislo'],
     'bankCode'      => $match_data['Banka_ucet_kod'],
-    'amount'        => $feeValues[0]['Value'],
+    'amount'        => $line['CastkaZaplatit'],
     'currency'      => $match_data['Banka_ucet_MENA'],
     'vs'            => $varsymbol,
     'message'       => $match_data['Zavod'],
@@ -60,7 +53,7 @@ $subject = "Chybějící platba " . $match_data['Zavod'];
 $message = $email_urgence_platba_text;
 $message = str_replace("##STRELEC##", $STRELEC, $message);
 $message = str_replace("##VAR_SYMBOL##", $varsymbol, $message);
-$message = str_replace("##CASTKA##", number_format($feeValues[0]['Value'], 2, ',', ' '), $message);
+$message = str_replace("##CASTKA##", number_format($line['CastkaZaplatit'], 2, ',', ' '), $message);
 $message = str_replace("##QR_LINK##", $qr_link, $message);
 $message = str_replace("##DatReg##", $datumRegistraceZavodnika->format('d.m.Y'), $message);
 $message = str_replace("##DatPay##", $paymentDeadline, $message);

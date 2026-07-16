@@ -128,7 +128,7 @@ if (
         WHERE Cislo= ?
         ");
     $stmt->bind_param(
-        "ssisisssssssi",
+        "ssisissssssssssi",
         $jmeno,
         $prijmeni,
         $_POST["Stav"],
@@ -172,7 +172,7 @@ if (
         WHERE Cislo= ?
         ");
     $stmt->bind_param(
-        "ssisissssssssi",
+        "ssisisssssssssi",
         $jmeno,
         $prijmeni,
         $_POST["Stav"],

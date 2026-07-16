@@ -21,6 +21,8 @@ if (empty($rows)) {
     exit;
 }
 
+$nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $rows[0]['Kategorie'], "Value");
+
 //vypocet celkove castky
 $discCount = count($rows);
 $FeeStmt = $conn->prepare("SELECT * FROM $table_fee  ORDER BY Count");
@@ -65,7 +67,7 @@ header("refresh:0;url=index.php");
 
 // příprava mailu zavodnikovi
 $STRELEC = "Závodník: " . htmlspecialchars($rows[0]['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($rows[0]['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
-$STRELEC .= "Kategorie: " . htmlspecialchars($rows[0]['Kategorie'], ENT_QUOTES, 'UTF-8') . "\r\n\r\n";
+$STRELEC .= "Kategorie: $nazev_kategorie \r\n\r\n";
 $STRELEC .= "Disciplíny:\r\n";
 
 foreach ($rows as $i => $r) {

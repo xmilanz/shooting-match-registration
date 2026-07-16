@@ -9,21 +9,16 @@ include "./header.php";
     <?php
 
 
-if (strpos($table, 'k4m') !== false) {
-    include_once __DIR__ . '/include/discipliny_k4m.php';
-}
-elseif (strpos($table, 'manevry') !== false) {
-    include_once __DIR__ . '/include/discipliny_manevry.php';
-}
-elseif (strpos($table, 'odstrelovacka') !== false) {
-include_once __DIR__ . '/include/discipliny_odstrelovacka.php';
-}
-else {
-}
+    if (strpos($table, 'k4m') !== false) {
+        include_once __DIR__ . '/include/discipliny_k4m.php';
+    } elseif (strpos($table, 'manevry') !== false) {
+        include_once __DIR__ . '/include/discipliny_manevry.php';
+    } elseif (strpos($table, 'odstrelovacka') !== false) {
+        include_once __DIR__ . '/include/discipliny_odstrelovacka.php';
+    } else {
+    }
 
-?>
-
-
+    ?>
 </div>
 <script>
     $('.portfolio-menu ul li').click(function() {

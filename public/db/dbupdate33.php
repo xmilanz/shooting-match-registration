@@ -13,7 +13,7 @@ $check = $conn->query("
 if ($check->num_rows == 0) {
     $result = $conn->query("
         ALTER TABLE `$table_matches`
-        ADD COLUMN `Web_zobrazovat_discipliny` TINYINT(1) DEFAULT 0
+        ADD COLUMN `Web_zobrazovat_discipliny` TINYINT(1) DEFAULT 1
         AFTER `Web_zobrazovat_situace`
     ");
     if (!$result) {

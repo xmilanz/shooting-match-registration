@@ -81,7 +81,6 @@ foreach ($discArr as $i => $disc) {
     $affected = $insertStmt->affected_rows;
 
     $nazev = getValueFromTable($conn, $table_disciplines, "Name", $disc, "Value");
-    //$link = "<a href='" . htmlspecialchars($reg_url, ENT_QUOTES, 'UTF-8') . "/zrus_ucast.php?id=" . rawurlencode($cislo) . "&klic=" . rawurlencode($klic) . "'>Zrušit účast</a>";
     $link = buildCancelLinks($reg_url, $cislo, $klic);
     $link_ical = buildCalendarLinks($reg_url, $match_data);
 
@@ -146,8 +145,12 @@ if ($affected === 0) {
 }
 
 // posíláme e-mail
+
+// nice nazev pro mail
+$nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $kategorie, "Value");
+
 $STRELEC = "Závodník: " . htmlspecialchars($jmeno, ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($prijmeni, ENT_QUOTES, 'UTF-8') . " [$link_ical] " . "\r\n";
-$STRELEC .= "Kategorie: $kategorie" . "\r\n\r\n";
+$STRELEC .= "Kategorie: $nazev_kategorie" . "\r\n\r\n";
 $STRELEC .= "Disciplíny:\r\n";
 
 foreach ($cisla_disc_odkazy as $i => $r) {

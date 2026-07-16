@@ -49,14 +49,11 @@ $isRegistracePozastavena = ($match_data['Zavod_registrace_pozastaveno']);
 $poradatel = "";
 $sponzor = "";
 
-if (!empty($match_data['Zavod_poradatel'])) {
-    $normalized = normalize($match_data['Zavod_poradatel']);
-
-    if (strpos($normalized, 'prachatice') !== false) {
-        $poradatel = "prachatice";
-        $sponzor = "<a href='https://prostordesign.cz/' target='_blank'><img src='./images/logo-prostor-design.png' class='img-thumbnail mb-3 mx-auto d-block' alt='Prostor Design'></a>";
-    }
+if (strpos(getPoradatel($match_data), 'prachatice') !== false) {
+    $poradatel = "prachatice";
+    $sponzor = "<a href='https://prostordesign.cz/' target='_blank'><img src='./images/logo-prostor-design.png' class='img-thumbnail mb-3 mx-auto d-block' alt='Prostor Design'></a>";
 }
+
 ?>
 <!doctype html>
 <html lang="cs">

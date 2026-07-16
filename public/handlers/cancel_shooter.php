@@ -7,7 +7,7 @@ $line = getShooterData($conn, $table, $cislo, $klic);
 
 // nice nazev pro mail
 $nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
-// nice nazev pro mail
+$nazev_kategorie = getValueFromTable($conn, $table_categories, "Name", $line['Kategorie'], "Value");
 
 if (!$line) {
     include './components/modal-warning.php';
@@ -137,8 +137,9 @@ if ($bulkId > 0) {
 }
 
 // posilame mail zavodnikovi
-$STRELEC .= "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
+$STRELEC = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
 $STRELEC .= "Disciplina: $nazev_discipliny" . "\r\n";
+$STRELEC .= "Kategorie: $nazev_kategorie" . "\r\n";
 
 $from_text = htmlspecialchars($match_data['Zavod_poradatel'], ENT_QUOTES, 'UTF-8');
 $from = htmlspecialchars($match_data['Zavod_email_from'], ENT_QUOTES, 'UTF-8');

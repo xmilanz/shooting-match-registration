@@ -135,7 +135,6 @@ $varsymbol = $varsymbol_new;
 $CastkaZaplatit = ($isVIP) ? '0'  : number_format($castka, 2, ',', ' ');
 
 // nice nazev pro mail
-$nazev_discipliny = getValueFromTable($conn, $table_disciplines, "Name", $line['Disciplina'], "Value");
 $nazev_kategorie = getValueFromTable($conn, "ssas_k4m_tenolix_categories", "Name", $line['Kategorie'], "Value");
 
 $STRELEC_SHOOTER = "Závodník: " . htmlspecialchars($line['Jmeno'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($line['Prijmeni'], ENT_QUOTES, 'UTF-8') . "\r\n";
@@ -145,7 +144,6 @@ $STRELEC_KATEGORIE = "Kategorie: $nazev_kategorie" . "\r\n";
 $STRELEC_TRENINK = "Trénink: " . ($trenink ? "ANO" : "NE") . "\r\n";
 $STRELEC_CASTKA = "Částka: $CastkaZaplatit  " . $match_data['Banka_ucet_MENA'] . "";
 
-//$link_cancel = "<a href='" . htmlspecialchars($reg_url, ENT_QUOTES, 'UTF-8') . "/zrus_ucast.php?id=" . rawurlencode($cislo) . "&klic=" . rawurlencode($line['klic']) . "'><strong>zrušit účast</strong></a>";
 $link_cancel = buildCancelLinks($reg_url, $cislo, $klic);
 $link_ical = buildCalendarLinks($reg_url, $match_data);
 

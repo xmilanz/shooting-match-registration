@@ -13,7 +13,7 @@ $check = $conn->query("
 if ($check->num_rows == 0) {
     $result = $conn->query("
         ALTER TABLE $table 
-        ADD COLUMN `ZbrojniOpravneni` tinyint(1) DEFAULT NULL 
+        ADD COLUMN `ZbrojniOpravneni` tinyint(1) DEFAULT 0 
         AFTER `ObcanskyPrukaz`
     ");
     if (!$result) {
